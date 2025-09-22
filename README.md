@@ -40,9 +40,12 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 - **Flutter 3.0+**: Cross-platform UI framework
 - **Dart 3.0+**: Primary programming language
 - **Clean Architecture**: Domain-driven design with dependency inversion
-- **Riverpod**: State management for reactive UI
-- **GetIt**: Dependency injection container
+- **BLoC Pattern**: Business Logic Component for state management
+- **Injectable**: Code generation for dependency injection
+- **GetIt**: Service locator for dependency injection
 - **Auto Route**: Type-safe navigation management
+- **Freezed**: Code generation for immutable classes and unions
+- **Dartz**: Functional programming (Either, Option) for error handling
 
 ### Firebase & Google Cloud Services
 - **Firebase Authentication**: User management with Google Sign-In
@@ -61,6 +64,9 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 - **Integration Testing**: Firebase emulator testing
 - **Widget Testing**: UI component testing
 - **Firebase Emulators**: Local development and testing environment
+- **Mockito**: Mocking framework for unit tests
+- **Build Runner**: Code generation for Freezed, Injectable, and JSON serialization
+- **JSON Annotation**: Serialization support for DTOs and models
 
 ### Additional Technologies
 - **Camera**: Barcode scanning functionality
@@ -72,11 +78,12 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 
 ### Domain Layer (Core Business Logic)
 **Entities & Value Objects**: Pure business logic without external dependencies
-- **Order Entity**: Order lifecycle, status transitions, business rules
+- **Order Entity**: Order lifecycle, status transitions, business rules (with Freezed)
 - **User Entity**: User roles, permissions, authentication state
 - **Station Entity**: Kitchen station management and capacity
 - **Recipe Entity**: Recipe data, ingredients, preparation instructions
-- **Value Objects**: Money, Time, Priority, OrderStatus
+- **Value Objects**: Money, Time, Priority, OrderStatus (immutable with Freezed)
+- **Failures**: Domain-specific error types with Dartz Either pattern
 
 ### Application Layer (Use Cases)
 **Business Orchestration**: Coordinates domain entities and external services
@@ -84,6 +91,8 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 - **User Management**: AuthenticateUser, ManageUserRoles, GetPermissions
 - **Kitchen Operations**: AssignOrderToStation, TrackPreparationTime
 - **Analytics**: GenerateReports, CalculateMetrics
+- **Error Handling**: Either<Failure, Success> pattern for all use cases
+- **Input/Output DTOs**: Freezed classes for type-safe data transfer
 
 ### Infrastructure Layer (External Services)
 **Firebase Integration**: Implementation of repository interfaces
@@ -92,13 +101,17 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 - **Cloud Messaging**: Push notifications for kitchen alerts
 - **Cloud Functions**: Server-side business logic execution
 - **Analytics Service**: Performance and usage tracking
+- **Data Mappers**: JSON serialization with json_annotation
+- **Dependency Injection**: Injectable registration for all services
 
 ### Presentation Layer (UI & Controllers)
-**User Interface**: Reactive UI with state management
-- **Riverpod Controllers**: State management for each feature
+**User Interface**: Reactive UI with BLoC state management
+- **BLoC Components**: Business Logic Components for each feature
+- **Events & States**: Freezed classes for type-safe state management
 - **UI Components**: Reusable widgets with Material 3 design
 - **Screens**: Kitchen display, order management, user interface
-- **Navigation**: Type-safe routing with authentication guards
+- **Navigation**: Type-safe routing with Auto Route and authentication guards
+- **BLoC Listeners**: Real-time UI updates based on state changes
 
 ## 🚀 Key Features
 
@@ -110,8 +123,11 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 
 ### Technical Features
 - **Clean Architecture**: Separation of concerns with dependency inversion
+- **BLoC Pattern**: Predictable state management with clear data flow
 - **Test-Driven Development**: TDD methodology for reliable code
 - **Firebase Real-time**: Instant synchronization across all devices
+- **Functional Programming**: Dartz Either pattern for error handling
+- **Code Generation**: Freezed for immutable classes, Injectable for DI
 - **Offline-First Architecture**: Continues operation without internet connectivity
 - **Progressive Web App (PWA)**: Web-based deployment with Firebase Hosting
 - **Responsive Design**: Adaptive UI for various screen sizes
@@ -131,12 +147,16 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 - **Dependency Inversion**: Abstract interfaces for all external services
 - **Single Responsibility**: Each class and module has one clear purpose
 - **SOLID Principles**: Maintainable and extensible codebase architecture
+- **Immutability**: Freezed classes for immutable data structures
+- **Functional Error Handling**: Dartz Either pattern instead of exceptions
 
 ### Test-Driven Development (TDD)
 - **Red-Green-Refactor**: Write tests first, implement, then refactor
 - **100% Domain Coverage**: Complete unit testing for all business logic
+- **BLoC Testing**: Comprehensive testing for all BLoCs with bloc_test
 - **Integration Testing**: Firebase emulator testing for realistic scenarios
 - **Widget Testing**: Comprehensive UI component testing
+- **Mock Generation**: Mockito for creating test doubles
 - **Continuous Integration**: Automated testing and quality checks
 
 ### Firebase-First Approach
@@ -150,6 +170,8 @@ Stacks follows Clean Architecture principles with strict separation of concerns 
 - **Code Reviews**: Mandatory peer reviews for all changes
 - **Documentation**: Comprehensive code and architecture documentation
 - **Performance Monitoring**: Continuous performance tracking and optimization
+- **Code Generation**: Build runner for Freezed, Injectable, and JSON serialization
+- **Static Analysis**: Very Good Analysis for enhanced Dart linting rules
 
 ### Customization Options
 - **Firebase Remote Config**: Dynamic configuration without app updates
