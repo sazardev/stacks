@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stacks/domain/entities/order.dart';
 import 'package:stacks/domain/entities/order_item.dart';
 import 'package:stacks/domain/entities/recipe.dart';
-import 'package:stacks/domain/entities/station.dart';
 import 'package:stacks/domain/value_objects/user_id.dart';
 import 'package:stacks/domain/value_objects/time.dart';
 import 'package:stacks/domain/value_objects/money.dart';

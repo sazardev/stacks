@@ -4,7 +4,6 @@ import 'package:stacks/domain/entities/recipe.dart';
 import 'package:stacks/domain/value_objects/user_id.dart';
 import 'package:stacks/domain/value_objects/time.dart';
 import 'package:stacks/domain/value_objects/money.dart';
-import 'package:stacks/domain/value_objects/order_status.dart';
 import 'package:stacks/domain/exceptions/domain_exception.dart';
 
 void main() {

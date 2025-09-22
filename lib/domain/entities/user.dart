@@ -152,7 +152,7 @@ class User {
     }
 
     final now = Time.now();
-    final sessionDuration = now.difference(_lastLoginAt!);
+    final sessionDuration = now.difference(_lastLoginAt);
     return sessionDuration.inHours >= _sessionTimeoutHours;
   }
 
