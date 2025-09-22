@@ -1,17 +1,17 @@
+import 'package:dartz/dartz.dart' show Right, Left;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:dartz/dartz.dart' show Either, Right, Left;
+import 'package:stacks/application/dtos/order_dtos.dart';
+import 'package:stacks/application/use_cases/update_order_status_use_case.dart';
 import 'package:stacks/domain/entities/order.dart' as domain;
 import 'package:stacks/domain/entities/order_item.dart';
 import 'package:stacks/domain/entities/recipe.dart';
-import 'package:stacks/domain/value_objects/user_id.dart';
-import 'package:stacks/domain/value_objects/time.dart';
-import 'package:stacks/domain/value_objects/money.dart';
-import 'package:stacks/domain/value_objects/priority.dart';
-import 'package:stacks/domain/value_objects/order_status.dart';
 import 'package:stacks/domain/failures/failures.dart';
-import 'package:stacks/application/dtos/order_dtos.dart';
-import 'package:stacks/application/use_cases/update_order_status_use_case.dart';
+import 'package:stacks/domain/value_objects/money.dart';
+import 'package:stacks/domain/value_objects/order_status.dart';
+import 'package:stacks/domain/value_objects/priority.dart';
+import 'package:stacks/domain/value_objects/time.dart';
+import 'package:stacks/domain/value_objects/user_id.dart';
 
 // Import mocks from create_order_use_case_test
 import 'create_order_use_case_test.mocks.dart';
