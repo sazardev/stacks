@@ -467,7 +467,10 @@ class FoodSafetyViolation {
       throw const DomainException('Violation is already resolved');
     }
 
-    final allActions = [..._correctiveActions, ...additionalActions ?? []];
+    final allActions = List<String>.from([
+      ..._correctiveActions,
+      ...additionalActions ?? [],
+    ]);
 
     return FoodSafetyViolation(
       id: _id,
