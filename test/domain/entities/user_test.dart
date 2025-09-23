@@ -15,39 +15,42 @@ void main() {
     });
 
     group('creation', () {
-      test('should create User with valid data', () {
+      test('should create User with dishwasher role', () {
         // Arrange & Act
         final user = User(
           id: userId,
-          email: 'test@example.com',
-          name: 'Test User',
-          role: UserRole.kitchenStaff,
+          email: 'dishwasher@kitchen.com',
+          name: 'John Dishwasher',
+          role: UserRole.dishwasher,
           createdAt: createdAt,
         );
 
         // Assert
         expect(user.id, equals(userId));
-        expect(user.email, equals('test@example.com'));
-        expect(user.name, equals('Test User'));
-        expect(user.role, equals(UserRole.kitchenStaff));
+        expect(user.email, equals('dishwasher@kitchen.com'));
+        expect(user.name, equals('John Dishwasher'));
+        expect(user.role, equals(UserRole.dishwasher));
         expect(user.createdAt, equals(createdAt));
         expect(user.isActive, isTrue);
         expect(user.isAuthenticated, isFalse);
+        expect(user.isKitchenStaff, isTrue);
+        expect(user.isManager, isFalse);
       });
 
-      test('should create User with manager role', () {
+      test('should create User with head chef role', () {
         // Arrange & Act
         final user = User(
           id: userId,
-          email: 'manager@example.com',
-          name: 'Manager User',
-          role: UserRole.manager,
+          email: 'chef@kitchen.com',
+          name: 'Chef Gordon',
+          role: UserRole.chefHead,
           createdAt: createdAt,
         );
 
         // Assert
-        expect(user.role, equals(UserRole.manager));
+        expect(user.role, equals(UserRole.chefHead));
         expect(user.isManager, isTrue);
+        expect(user.isSeniorStaff, isTrue);
       });
 
       test('should create User with admin role', () {
@@ -72,7 +75,7 @@ void main() {
             id: userId,
             email: '',
             name: 'Test User',
-            role: UserRole.kitchenStaff,
+            role: UserRole.lineCook,
             createdAt: createdAt,
           ),
           throwsA(isA<DomainException>()),
@@ -86,7 +89,7 @@ void main() {
             id: userId,
             email: 'invalid-email',
             name: 'Test User',
-            role: UserRole.kitchenStaff,
+            role: UserRole.lineCook,
             createdAt: createdAt,
           ),
           throwsA(isA<DomainException>()),
@@ -100,7 +103,7 @@ void main() {
             id: userId,
             email: 'test@example.com',
             name: '',
-            role: UserRole.kitchenStaff,
+            role: UserRole.lineCook,
             createdAt: createdAt,
           ),
           throwsA(isA<DomainException>()),
@@ -117,7 +120,7 @@ void main() {
             id: userId,
             email: 'test@example.com',
             name: longName,
-            role: UserRole.kitchenStaff,
+            role: UserRole.lineCook,
             createdAt: createdAt,
           ),
           throwsA(isA<DomainException>()),
@@ -132,7 +135,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
         final sessionId = 'session123';
@@ -153,7 +156,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
         final authenticatedUser = user.authenticate('session123', Time.now());
@@ -172,7 +175,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
         final oldLoginTime = Time.fromDateTime(
@@ -193,7 +196,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
         final recentLoginTime = Time.fromDateTime(
@@ -213,42 +216,43 @@ void main() {
     });
 
     group('permissions', () {
-      test('should check kitchen staff permissions', () {
+      test('should check line cook permissions', () {
         // Arrange
         final user = User(
           id: userId,
-          email: 'staff@example.com',
-          name: 'Kitchen Staff',
-          role: UserRole.kitchenStaff,
+          email: 'linecook@example.com',
+          name: 'Line Cook',
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
         // Act & Assert
         expect(user.canViewOrders(), isTrue);
         expect(user.canUpdateOrderStatus(), isTrue);
+        expect(user.canWorkStation(), isTrue);
+        expect(user.canViewRecipes(), isTrue);
         expect(user.canManageUsers(), isFalse);
-        expect(user.canAccessReports(), isFalse);
-        expect(user.canManageStations(), isFalse);
-        expect(user.canDeleteOrders(), isFalse);
+        expect(user.canViewAdvancedReports(), isFalse);
+        expect(user.canSuperviseStaff(), isFalse);
       });
 
-      test('should check manager permissions', () {
+      test('should check sous chef permissions', () {
         // Arrange
         final user = User(
           id: userId,
-          email: 'manager@example.com',
-          name: 'Manager',
-          role: UserRole.manager,
+          email: 'souschef@example.com',
+          name: 'Sous Chef',
+          role: UserRole.sousChef,
           createdAt: createdAt,
         );
 
         // Act & Assert
         expect(user.canViewOrders(), isTrue);
         expect(user.canUpdateOrderStatus(), isTrue);
+        expect(user.canCancelOrders(), isTrue);
         expect(user.canManageUsers(), isTrue);
-        expect(user.canAccessReports(), isTrue);
-        expect(user.canManageStations(), isTrue);
-        expect(user.canDeleteOrders(), isTrue);
+        expect(user.canViewAdvancedReports(), isTrue);
+        expect(user.canSuperviseStaff(), isTrue);
       });
 
       test('should check admin permissions', () {
@@ -265,35 +269,35 @@ void main() {
         expect(user.canViewOrders(), isTrue);
         expect(user.canUpdateOrderStatus(), isTrue);
         expect(user.canManageUsers(), isTrue);
-        expect(user.canAccessReports(), isTrue);
-        expect(user.canManageStations(), isTrue);
-        expect(user.canDeleteOrders(), isTrue);
+        expect(user.canViewAdvancedReports(), isTrue);
+        expect(user.canSuperviseStaff(), isTrue);
+        expect(user.canManageInventory(), isTrue);
         expect(user.canManageSystem(), isTrue);
       });
 
       test('should check specific permissions for roles', () {
         // Arrange
-        final staffUser = User(
+        final lineCookUser = User(
           id: userId,
-          email: 'staff@example.com',
-          name: 'Staff',
-          role: UserRole.kitchenStaff,
+          email: 'linecook@example.com',
+          name: 'Line Cook',
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
-        final managerUser = User(
-          id: UserId('manager123'),
-          email: 'manager@example.com',
-          name: 'Manager',
-          role: UserRole.manager,
+        final sousChefUser = User(
+          id: UserId('souschef123'),
+          email: 'souschef@example.com',
+          name: 'Sous Chef',
+          role: UserRole.sousChef,
           createdAt: createdAt,
         );
 
         // Act & Assert
-        expect(staffUser.hasPermission(Permission.viewOrders), isTrue);
-        expect(staffUser.hasPermission(Permission.manageUsers), isFalse);
-        expect(managerUser.hasPermission(Permission.manageUsers), isTrue);
-        expect(managerUser.hasPermission(Permission.manageSystem), isFalse);
+        expect(lineCookUser.hasPermission(Permission.viewOrders), isTrue);
+        expect(lineCookUser.hasPermission(Permission.manageUsers), isFalse);
+        expect(sousChefUser.hasPermission(Permission.manageUsers), isTrue);
+        expect(sousChefUser.hasPermission(Permission.manageSystem), isFalse);
       });
     });
 
@@ -304,7 +308,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
           isActive: false,
         );
@@ -322,7 +326,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
           isActive: true,
         );
@@ -340,7 +344,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -356,7 +360,7 @@ void main() {
         expect(updatedUser.id, equals(userId)); // ID should remain same
         expect(
           updatedUser.role,
-          equals(UserRole.kitchenStaff),
+          equals(UserRole.lineCook),
         ); // Role should remain same
       });
 
@@ -366,15 +370,15 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
         // Act
-        final promotedUser = user.changeRole(UserRole.manager);
+        final promotedUser = user.changeRole(UserRole.sousChef);
 
         // Assert
-        expect(promotedUser.role, equals(UserRole.manager));
+        expect(promotedUser.role, equals(UserRole.sousChef));
         expect(promotedUser.isManager, isTrue);
       });
     });
@@ -382,18 +386,19 @@ void main() {
     group('business rules', () {
       test('should validate user can perform action based on role', () {
         // Arrange
-        final staffUser = User(
+        final lineCookUser = User(
           id: userId,
-          email: 'staff@example.com',
-          name: 'Staff',
-          role: UserRole.kitchenStaff,
+          email: 'linecook@example.com',
+          name: 'Line Cook',
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
         // Act & Assert
-        expect(staffUser.canPerformAction('VIEW_ORDERS'), isTrue);
-        expect(staffUser.canPerformAction('UPDATE_ORDER_STATUS'), isTrue);
-        expect(staffUser.canPerformAction('MANAGE_USERS'), isFalse);
+        expect(lineCookUser.canPerformAction('VIEW_ORDERS'), isTrue);
+        expect(lineCookUser.canPerformAction('UPDATE_ORDER_STATUS'), isTrue);
+        expect(lineCookUser.canPerformAction('WORK_STATION'), isTrue);
+        expect(lineCookUser.canPerformAction('MANAGE_USERS'), isFalse);
       });
 
       test('should get user display name', () {
@@ -402,7 +407,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -419,7 +424,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'John David Smith',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -436,7 +441,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'John',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -455,7 +460,7 @@ void main() {
           id: userId,
           email: 'test1@example.com',
           name: 'User 1',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -463,7 +468,7 @@ void main() {
           id: userId,
           email: 'test2@example.com',
           name: 'User 2',
-          role: UserRole.manager,
+          role: UserRole.sousChef,
           createdAt: Time.now(),
         );
 
@@ -478,7 +483,7 @@ void main() {
           id: UserId('user1'),
           email: 'test@example.com',
           name: 'User 1',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -486,7 +491,7 @@ void main() {
           id: UserId('user2'),
           email: 'test@example.com',
           name: 'User 1',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -502,7 +507,7 @@ void main() {
           id: userId,
           email: 'test@example.com',
           name: 'Test User',
-          role: UserRole.kitchenStaff,
+          role: UserRole.lineCook,
           createdAt: createdAt,
         );
 
@@ -512,7 +517,7 @@ void main() {
         // Assert
         expect(
           string,
-          equals('User(id: user123, name: Test User, role: kitchenStaff)'),
+          equals('User(id: user123, name: Test User, role: lineCook)'),
         );
       });
     });

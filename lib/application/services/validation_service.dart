@@ -109,7 +109,8 @@ class ValidationService {
     try {
       // Only managers and admins can change priority to critical
       if (newPriority.level == Priority.critical &&
-          requestingUser.role != UserRole.manager &&
+          requestingUser.role != UserRole.kitchenManager &&
+          requestingUser.role != UserRole.generalManager &&
           requestingUser.role != UserRole.admin) {
         return Left(
           ValidationFailure(
@@ -168,21 +169,21 @@ class ValidationService {
           }
           break;
         case 'delete_orders':
-          if (!user.canDeleteOrders()) {
+          if (!user.canCancelOrders()) {
             return Left(
-              ValidationFailure('User lacks permission to delete orders'),
+              ValidationFailure('User lacks permission to cancel orders'),
             );
           }
           break;
         case 'manage_stations':
-          if (!user.canManageStations()) {
+          if (!user.canChangeStationStatus()) {
             return Left(
               ValidationFailure('User lacks permission to manage stations'),
             );
           }
           break;
         case 'access_reports':
-          if (!user.canAccessReports()) {
+          if (!user.canViewBasicReports()) {
             return Left(
               ValidationFailure('User lacks permission to access reports'),
             );
