@@ -52,8 +52,10 @@ void main() {
           expect(table.section, equals(TableSection.mainDining));
           expect(table.status, equals(TableStatus.available));
           expect(table.requirements.length, equals(2));
-          expect(table.requirements,
-              contains(TableRequirement.wheelchairAccessible));
+          expect(
+            table.requirements,
+            contains(TableRequirement.wheelchairAccessible),
+          );
           expect(table.requirements, contains(TableRequirement.highChair));
           expect(table.currentServerId, equals(serverId));
           expect(table.currentReservationId, equals(reservationId));
@@ -283,14 +285,18 @@ void main() {
             createdAt: createdAt,
           );
 
-          expect(table.hasRequirement(TableRequirement.wheelchairAccessible),
-              isTrue);
+          expect(
+            table.hasRequirement(TableRequirement.wheelchairAccessible),
+            isTrue,
+          );
           expect(table.hasRequirement(TableRequirement.highChair), isTrue);
           expect(table.hasRequirement(TableRequirement.quiet), isFalse);
         });
 
         test('should calculate minutes since last cleaned', () {
-          final thirtyMinutesAgo = createdAt.subtract(const Duration(minutes: 30));
+          final thirtyMinutesAgo = createdAt.subtract(
+            const Duration(minutes: 30),
+          );
           final table = Table(
             id: tableId,
             tableNumber: 'T1',
@@ -308,25 +314,30 @@ void main() {
           expect(minutes, greaterThanOrEqualTo(30));
         });
 
-        test('should return null for minutes since last cleaned when never cleaned', () {
-          final table = Table(
-            id: tableId,
-            tableNumber: 'T1',
-            capacity: 4,
-            section: TableSection.mainDining,
-            status: TableStatus.available,
-            requirements: [],
-            isActive: true,
-            createdAt: createdAt,
-          );
+        test(
+          'should return null for minutes since last cleaned when never cleaned',
+          () {
+            final table = Table(
+              id: tableId,
+              tableNumber: 'T1',
+              capacity: 4,
+              section: TableSection.mainDining,
+              status: TableStatus.available,
+              requirements: [],
+              isActive: true,
+              createdAt: createdAt,
+            );
 
-          expect(table.minutesSinceLastCleaned, isNull);
-        });
+            expect(table.minutesSinceLastCleaned, isNull);
+          },
+        );
 
         test('should identify cleaning overdue status', () {
-          final twentyMinutesAgo = createdAt.subtract(const Duration(minutes: 20));
+          final twentyMinutesAgo = createdAt.subtract(
+            const Duration(minutes: 20),
+          );
           final fiveMinutesAgo = createdAt.subtract(const Duration(minutes: 5));
-          
+
           final overdueTable = Table(
             id: tableId,
             tableNumber: 'T1',
@@ -467,23 +478,26 @@ void main() {
           expect(seatedTable.lastOccupiedAt, isNotNull);
         });
 
-        test('should throw exception when seating guests at unavailable table', () {
-          final occupiedTable = Table(
-            id: tableId,
-            tableNumber: 'T1',
-            capacity: 4,
-            section: TableSection.mainDining,
-            status: TableStatus.occupied,
-            requirements: [],
-            isActive: true,
-            createdAt: createdAt,
-          );
+        test(
+          'should throw exception when seating guests at unavailable table',
+          () {
+            final occupiedTable = Table(
+              id: tableId,
+              tableNumber: 'T1',
+              capacity: 4,
+              section: TableSection.mainDining,
+              status: TableStatus.occupied,
+              requirements: [],
+              isActive: true,
+              createdAt: createdAt,
+            );
 
-          expect(
-            () => occupiedTable.seatGuests(serverId),
-            throwsA(isA<DomainException>()),
-          );
-        });
+            expect(
+              () => occupiedTable.seatGuests(serverId),
+              throwsA(isA<DomainException>()),
+            );
+          },
+        );
 
         test('should clear table successfully', () {
           final occupiedTable = Table(
@@ -562,23 +576,26 @@ void main() {
           expect(cleanedTable.lastCleanedAt, isNotNull);
         });
 
-        test('should throw exception when marking non-cleanable table as cleaned', () {
-          final availableTable = Table(
-            id: tableId,
-            tableNumber: 'T1',
-            capacity: 4,
-            section: TableSection.mainDining,
-            status: TableStatus.available,
-            requirements: [],
-            isActive: true,
-            createdAt: createdAt,
-          );
+        test(
+          'should throw exception when marking non-cleanable table as cleaned',
+          () {
+            final availableTable = Table(
+              id: tableId,
+              tableNumber: 'T1',
+              capacity: 4,
+              section: TableSection.mainDining,
+              status: TableStatus.available,
+              requirements: [],
+              isActive: true,
+              createdAt: createdAt,
+            );
 
-          expect(
-            () => availableTable.markCleaned(),
-            throwsA(isA<DomainException>()),
-          );
-        });
+            expect(
+              () => availableTable.markCleaned(),
+              throwsA(isA<DomainException>()),
+            );
+          },
+        );
 
         test('should reserve table successfully', () {
           final availableTable = Table(
@@ -710,10 +727,7 @@ void main() {
               DietaryRestriction.glutenFree,
             ],
             allergens: ['nuts', 'dairy'],
-            preferences: {
-              'spice_level': 'medium',
-              'seating': 'window',
-            },
+            preferences: {'spice_level': 'medium', 'seating': 'window'},
             orderHistory: [orderId],
             visitCount: 5,
             lastVisit: createdAt.subtract(const Duration(days: 7)),
@@ -917,12 +931,18 @@ void main() {
             createdAt: createdAt,
           );
 
-          expect(customer.hasDietaryRestriction(DietaryRestriction.vegetarian),
-              isTrue);
-          expect(customer.hasDietaryRestriction(DietaryRestriction.glutenFree),
-              isTrue);
-          expect(customer.hasDietaryRestriction(DietaryRestriction.vegan),
-              isFalse);
+          expect(
+            customer.hasDietaryRestriction(DietaryRestriction.vegetarian),
+            isTrue,
+          );
+          expect(
+            customer.hasDietaryRestriction(DietaryRestriction.glutenFree),
+            isTrue,
+          );
+          expect(
+            customer.hasDietaryRestriction(DietaryRestriction.vegan),
+            isFalse,
+          );
         });
 
         test('should check for allergens correctly', () {
@@ -1091,10 +1111,7 @@ void main() {
             id: customerId,
             firstName: 'John',
             lastName: 'Doe',
-            preferences: {
-              'spice_level': 'mild',
-              'seating': 'booth',
-            },
+            preferences: {'spice_level': 'mild', 'seating': 'booth'},
             createdAt: createdAt,
           );
 
