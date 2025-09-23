@@ -1,4 +1,8 @@
+// Food Safety Use Cases for Clean Architecture Application Layer
+// Complete coverage for TemperatureLog, FoodSafetyViolation, HACCPControlPoint, and FoodSafetyAudit entities
+
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import 'package:stacks/domain/entities/food_safety.dart';
 import 'package:stacks/domain/failures/failures.dart';
 import 'package:stacks/domain/repositories/food_safety_repository.dart';
@@ -11,6 +15,7 @@ import 'package:stacks/application/dtos/food_safety_dtos.dart';
 // ======================== Temperature Log Use Cases ========================
 
 /// Use case for creating a temperature log entry
+@injectable
 class CreateTemperatureLogUseCase {
   final FoodSafetyRepository _repository;
 
@@ -44,6 +49,7 @@ class CreateTemperatureLogUseCase {
 }
 
 /// Use case for creating a food safety violation
+@injectable
 class CreateFoodSafetyViolationUseCase {
   final FoodSafetyRepository _repository;
 

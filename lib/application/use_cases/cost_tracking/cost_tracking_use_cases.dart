@@ -1,4 +1,8 @@
+// Cost Tracking Use Cases for Clean Architecture Application Layer
+// Complete coverage for Cost, CostCenter, ProfitabilityReport, and RecipeCost entities
+
 import 'package:dartz/dartz.dart' show Either, Unit, Left;
+import 'package:injectable/injectable.dart';
 import '../../../domain/entities/cost_tracking.dart';
 import '../../../domain/repositories/cost_tracking_repository.dart';
 import '../../../domain/failures/failures.dart';
@@ -8,6 +12,7 @@ import '../../../domain/value_objects/money.dart';
 import '../../dtos/cost_tracking_dtos.dart';
 
 /// Use case for creating a cost entry
+@injectable
 class CreateCostUseCase {
   final CostTrackingRepository _repository;
 
@@ -149,6 +154,7 @@ class SearchCostsByDescriptionUseCase {
 }
 
 /// Use case for creating a cost center
+@injectable
 class CreateCostCenterUseCase {
   final CostTrackingRepository _repository;
 
