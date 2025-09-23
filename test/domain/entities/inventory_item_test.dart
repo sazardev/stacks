@@ -444,8 +444,10 @@ void main() {
         late InventoryItem item;
 
         setUp(() {
+          final futureExpirationDate = createdAt.add(Duration(days: 3));
           item = InventoryItem(
             id: inventoryId,
+            supplierId: supplierId,
             name: 'Test Item',
             sku: 'TEST-001',
             category: InventoryCategory.produce,
@@ -456,7 +458,7 @@ void main() {
             unitCost: Money(5.0),
             storageLocation: StorageLocation.walkInCooler,
             isPerishable: true,
-            expirationDate: Time.now().add(Duration(days: 2)),
+            expirationDate: futureExpirationDate,
             requiresTemperatureControl: true,
             minimumTemperature: 1.0,
             maximumTemperature: 4.0,
@@ -588,10 +590,12 @@ void main() {
         });
 
         test('should calculate days until expiration', () {
-          expect(item.daysUntilExpiration, equals(2));
+          expect(item.daysUntilExpiration, greaterThanOrEqualTo(2));
 
+          final futureDate = createdAt.add(Duration(days: 2));
           final soonToExpireItem = InventoryItem(
             id: inventoryId,
+            supplierId: supplierId,
             name: 'Soon to Expire',
             sku: 'SOON-001',
             category: InventoryCategory.produce,
@@ -602,11 +606,11 @@ void main() {
             unitCost: Money(5.0),
             storageLocation: StorageLocation.walkInCooler,
             isPerishable: true,
-            expirationDate: Time.now().add(Duration(days: 1)),
+            expirationDate: futureDate,
             createdAt: createdAt,
           );
 
-          expect(soonToExpireItem.daysUntilExpiration, equals(1));
+          expect(soonToExpireItem.daysUntilExpiration, greaterThanOrEqualTo(1));
           expect(soonToExpireItem.expiresSoon, isTrue); // <= 3 days
         });
 

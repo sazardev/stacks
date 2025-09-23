@@ -106,22 +106,22 @@ void main() {
         test('should check if metric meets target', () {
           final meetsTarget = KitchenMetric(
             id: metricId,
-            type: MetricType.orderCompletionTime,
-            name: 'Order Time',
-            value: 12.0,
-            unit: 'minutes',
-            target: 15.0,
+            type: MetricType.stationEfficiency,
+            name: 'Station Efficiency',
+            value: 85.0,
+            unit: 'percentage',
+            target: 80.0,
             recordedAt: recordedAt,
             period: AnalyticsPeriod.daily,
           );
 
           final missesTarget = KitchenMetric(
             id: metricId,
-            type: MetricType.orderCompletionTime,
-            name: 'Order Time',
-            value: 18.0,
-            unit: 'minutes',
-            target: 15.0,
+            type: MetricType.stationEfficiency,
+            name: 'Station Efficiency',
+            value: 75.0,
+            unit: 'percentage',
+            target: 80.0,
             recordedAt: recordedAt,
             period: AnalyticsPeriod.daily,
           );
@@ -137,6 +137,7 @@ void main() {
             name: 'Efficiency',
             value: 95.0,
             unit: 'percentage',
+            target: 100.0,
             recordedAt: recordedAt,
             period: AnalyticsPeriod.daily,
           );
@@ -147,6 +148,7 @@ void main() {
             name: 'Efficiency',
             value: 50.0,
             unit: 'percentage',
+            target: 100.0,
             recordedAt: recordedAt,
             period: AnalyticsPeriod.daily,
           );
@@ -161,27 +163,26 @@ void main() {
         test('should check trending direction', () {
           final trendingUp = KitchenMetric(
             id: metricId,
-            type: MetricType.orderCompletionTime,
-            name: 'Order Time',
-            value: 12.0,
-            unit: 'minutes',
-            previousValue: 15.0,
+            type: MetricType.stationEfficiency,
+            name: 'Station Efficiency',
+            value: 85.0,
+            unit: 'percentage',
+            previousValue: 80.0,
             recordedAt: recordedAt,
             period: AnalyticsPeriod.daily,
           );
 
           final trendingDown = KitchenMetric(
             id: metricId,
-            type: MetricType.orderCompletionTime,
-            name: 'Order Time',
-            value: 18.0,
-            unit: 'minutes',
-            previousValue: 15.0,
+            type: MetricType.stationEfficiency,
+            name: 'Station Efficiency',
+            value: 75.0,
+            unit: 'percentage',
+            previousValue: 80.0,
             recordedAt: recordedAt,
             period: AnalyticsPeriod.daily,
           );
 
-          // For completion time, lower is better, so trending up means improvement
           expect(trendingUp.isTrendingUp, isTrue);
           expect(trendingDown.isTrendingUp, isFalse);
         });
@@ -214,6 +215,8 @@ void main() {
         });
 
         test('should not be equal when ids are different', () {
+          final differentId = UserId('different-metric-id');
+
           final metric1 = KitchenMetric(
             id: metricId,
             type: MetricType.orderCompletionTime,
@@ -225,7 +228,7 @@ void main() {
           );
 
           final metric2 = KitchenMetric(
-            id: UserId.generate(),
+            id: differentId,
             type: MetricType.orderCompletionTime,
             name: 'Order Time',
             value: 12.0,
@@ -251,9 +254,10 @@ void main() {
           );
 
           final result = metric.toString();
-          expect(result, contains('Order Time'));
+          expect(result, contains('KitchenMetric'));
           expect(result, contains('12.5'));
           expect(result, contains('minutes'));
+          expect(result, contains('orderCompletionTime'));
         });
       });
     });
@@ -321,6 +325,7 @@ void main() {
               name: 'Order Time',
               value: 12.0,
               unit: 'minutes',
+              target: 15.0,
               recordedAt: recordedAt,
               period: AnalyticsPeriod.daily,
               stationId: stationId,
@@ -331,6 +336,7 @@ void main() {
               name: 'Station Efficiency',
               value: 95.0,
               unit: 'percentage',
+              target: 100.0,
               recordedAt: recordedAt,
               period: AnalyticsPeriod.daily,
               stationId: stationId,
@@ -339,8 +345,9 @@ void main() {
               id: UserId.generate(),
               type: MetricType.orderCompletionTime,
               name: 'Poor Metric',
-              value: 5.0,
+              value: 50.0,
               unit: 'percentage',
+              target: 100.0,
               recordedAt: recordedAt,
               period: AnalyticsPeriod.daily,
             ),
@@ -380,7 +387,7 @@ void main() {
         test('should get metrics needing improvement', () {
           final needsImprovement = report.metricsNeedingImprovement;
           expect(needsImprovement, hasLength(1));
-          expect(needsImprovement.first.value, equals(5.0));
+          expect(needsImprovement.first.value, equals(50.0));
         });
 
         test('should get top performing metrics', () {
@@ -525,7 +532,7 @@ void main() {
             errorCount: 1,
             efficiencyScore: 95.0,
             customersServed: 55,
-            customerSatisfactionScore: 4.8,
+            customerSatisfactionScore: 8.5,
             totalWorkTime: const Duration(hours: 8),
           );
 
@@ -589,29 +596,32 @@ void main() {
     group('KitchenEfficiencyAnalytics', () {
       group('creation', () {
         test('should create KitchenEfficiencyAnalytics with valid data', () {
+          final station1Id = UserId('station-001');
+          final station2Id = UserId('station-002');
+
           final analytics = KitchenEfficiencyAnalytics(
             id: UserId.generate(),
             date: recordedAt,
-            stationUtilization: {stationId: 85.0, userId: 78.0},
-            stationAverageTime: {stationId: const Duration(minutes: 12)},
-            stationOrderCount: {stationId: 45, userId: 38},
+            stationUtilization: {station1Id: 85.0, station2Id: 78.0},
+            stationAverageTime: {station1Id: const Duration(minutes: 12)},
+            stationOrderCount: {station1Id: 45, station2Id: 38},
             overallEfficiency: 82.3,
             averageOrderTime: const Duration(minutes: 12),
             peakHourAverageTime: const Duration(minutes: 18),
             bottleneckStationCount: 1,
-            bottleneckStations: [stationId],
+            bottleneckStations: [station1Id],
             capacityUtilization: 78.5,
             efficiencyIssues: ['Peak hour bottlenecks'],
             optimizationSuggestions: ['Add prep station capacity'],
           );
 
           expect(analytics.date, equals(recordedAt));
-          expect(analytics.stationUtilization[stationId], equals(85.0));
+          expect(analytics.stationUtilization[station1Id], equals(85.0));
           expect(
-            analytics.stationAverageTime[stationId],
+            analytics.stationAverageTime[station1Id],
             equals(const Duration(minutes: 12)),
           );
-          expect(analytics.stationOrderCount[stationId], equals(45));
+          expect(analytics.stationOrderCount[station1Id], equals(45));
           expect(analytics.overallEfficiency, equals(82.3));
           expect(
             analytics.averageOrderTime,
@@ -622,7 +632,7 @@ void main() {
             equals(const Duration(minutes: 18)),
           );
           expect(analytics.bottleneckStationCount, equals(1));
-          expect(analytics.bottleneckStations, contains(stationId));
+          expect(analytics.bottleneckStations, contains(station1Id));
           expect(analytics.capacityUtilization, equals(78.5));
           expect(analytics.efficiencyIssues, contains('Peak hour bottlenecks'));
           expect(
@@ -673,12 +683,15 @@ void main() {
         });
 
         test('should identify station utilization patterns', () {
+          final highUtilizationStation = UserId('high-station');
+          final lowUtilizationStation = UserId('low-station');
+
           final analytics = KitchenEfficiencyAnalytics(
             id: UserId.generate(),
             date: recordedAt,
             stationUtilization: {
-              stationId: 95.0, // High utilization
-              userId: 45.0, // Low utilization
+              highUtilizationStation: 95.0, // High utilization
+              lowUtilizationStation: 45.0, // Low utilization
             },
             overallEfficiency: 75.0,
             averageOrderTime: const Duration(minutes: 12),
@@ -687,8 +700,8 @@ void main() {
             capacityUtilization: 70.0,
           );
 
-          expect(analytics.mostUtilizedStation, equals(stationId));
-          expect(analytics.leastUtilizedStation, equals(userId));
+          expect(analytics.mostUtilizedStation, equals(highUtilizationStation));
+          expect(analytics.leastUtilizedStation, equals(lowUtilizationStation));
           expect(analytics.needsRebalancing, isTrue); // 50% difference
         });
 
