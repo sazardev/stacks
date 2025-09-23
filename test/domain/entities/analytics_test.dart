@@ -3,7 +3,6 @@ import 'package:stacks/domain/entities/analytics.dart';
 import 'package:stacks/domain/entities/user.dart';
 import 'package:stacks/domain/value_objects/user_id.dart';
 import 'package:stacks/domain/value_objects/time.dart';
-import 'package:stacks/domain/exceptions/domain_exception.dart';
 
 void main() {
   group('Analytics', () {
