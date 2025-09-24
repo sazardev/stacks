@@ -7,7 +7,9 @@ import 'dart:async' as _i4;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:stacks/domain/entities/analytics.dart' as _i16;
+import 'package:mockito/src/dummies.dart' as _i20;
+import 'package:stacks/application/config/kitchen_config.dart' as _i19;
+import 'package:stacks/domain/entities/analytics.dart' as _i18;
 import 'package:stacks/domain/entities/order.dart' as _i6;
 import 'package:stacks/domain/entities/order_item.dart' as _i10;
 import 'package:stacks/domain/entities/recipe.dart' as _i12;
@@ -15,11 +17,13 @@ import 'package:stacks/domain/entities/user.dart' as _i15;
 import 'package:stacks/domain/failures/failures.dart' as _i5;
 import 'package:stacks/domain/repositories/order_repository.dart' as _i3;
 import 'package:stacks/domain/repositories/recipe_repository.dart' as _i11;
+import 'package:stacks/domain/repositories/user_repository.dart' as _i14;
 import 'package:stacks/domain/services/workflow_validation_service.dart'
-    as _i14;
+    as _i17;
 import 'package:stacks/domain/value_objects/money.dart' as _i13;
 import 'package:stacks/domain/value_objects/order_status.dart' as _i8;
 import 'package:stacks/domain/value_objects/priority.dart' as _i9;
+import 'package:stacks/domain/value_objects/time.dart' as _i16;
 import 'package:stacks/domain/value_objects/user_id.dart' as _i7;
 
 // ignore_for_file: type=lint
@@ -730,11 +734,306 @@ class MockRecipeRepository extends _i1.Mock implements _i11.RecipeRepository {
           as _i4.Stream<_i2.Either<_i5.Failure, _i12.Recipe>>);
 }
 
+/// A class which mocks [UserRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUserRepository extends _i1.Mock implements _i14.UserRepository {
+  MockUserRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> createUser(_i15.User? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#createUser, [user]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#createUser, [user]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> getUserById(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserById, [userId]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#getUserById, [userId]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> getUserByEmail(
+    String? email,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserByEmail, [email]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#getUserByEmail, [email]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>> getAllUsers() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAllUsers, []),
+            returnValue:
+                _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i15.User>>(
+                    this,
+                    Invocation.method(#getAllUsers, []),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>> getUsersByRole(
+    _i15.UserRole? role,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUsersByRole, [role]),
+            returnValue:
+                _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i15.User>>(
+                    this,
+                    Invocation.method(#getUsersByRole, [role]),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>> getActiveUsers() =>
+      (super.noSuchMethod(
+            Invocation.method(#getActiveUsers, []),
+            returnValue:
+                _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>>.value(
+                  _FakeEither_0<_i5.Failure, List<_i15.User>>(
+                    this,
+                    Invocation.method(#getActiveUsers, []),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i15.User>>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> updateUser(_i15.User? user) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUser, [user]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#updateUser, [user]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> authenticateUser(
+    String? email,
+    String? password,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#authenticateUser, [email, password]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#authenticateUser, [email, password]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> logoutUser(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#logoutUser, [userId]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#logoutUser, [userId]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> updateUserRole(
+    _i7.UserId? userId,
+    _i15.UserRole? role,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUserRole, [userId, role]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#updateUserRole, [userId, role]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> activateUser(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#activateUser, [userId]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#activateUser, [userId]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> deactivateUser(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#deactivateUser, [userId]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#deactivateUser, [userId]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, bool>> hasPermission(
+    _i7.UserId? userId,
+    _i15.Permission? permission,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#hasPermission, [userId, permission]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, bool>>.value(
+              _FakeEither_0<_i5.Failure, bool>(
+                this,
+                Invocation.method(#hasPermission, [userId, permission]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, bool>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, List<_i15.Permission>>> getUserPermissions(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserPermissions, [userId]),
+            returnValue:
+                _i4.Future<
+                  _i2.Either<_i5.Failure, List<_i15.Permission>>
+                >.value(
+                  _FakeEither_0<_i5.Failure, List<_i15.Permission>>(
+                    this,
+                    Invocation.method(#getUserPermissions, [userId]),
+                  ),
+                ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, List<_i15.Permission>>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i15.User>> updateUserSession(
+    _i7.UserId? userId,
+    String? sessionId,
+    _i16.Time? loginTime,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateUserSession, [
+              userId,
+              sessionId,
+              loginTime,
+            ]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i15.User>>.value(
+              _FakeEither_0<_i5.Failure, _i15.User>(
+                this,
+                Invocation.method(#updateUserSession, [
+                  userId,
+                  sessionId,
+                  loginTime,
+                ]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i15.User>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, bool>> isSessionValid(
+    _i7.UserId? userId,
+    String? sessionId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#isSessionValid, [userId, sessionId]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, bool>>.value(
+              _FakeEither_0<_i5.Failure, bool>(
+                this,
+                Invocation.method(#isSessionValid, [userId, sessionId]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, bool>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i2.Unit>> deleteUser(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteUser, [userId]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i2.Unit>>.value(
+              _FakeEither_0<_i5.Failure, _i2.Unit>(
+                this,
+                Invocation.method(#deleteUser, [userId]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i2.Unit>>);
+
+  @override
+  _i4.Stream<_i2.Either<_i5.Failure, List<_i15.User>>> watchUsers() =>
+      (super.noSuchMethod(
+            Invocation.method(#watchUsers, []),
+            returnValue:
+                _i4.Stream<_i2.Either<_i5.Failure, List<_i15.User>>>.empty(),
+          )
+          as _i4.Stream<_i2.Either<_i5.Failure, List<_i15.User>>>);
+
+  @override
+  _i4.Stream<_i2.Either<_i5.Failure, _i15.User>> watchUser(
+    _i7.UserId? userId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#watchUser, [userId]),
+            returnValue: _i4.Stream<_i2.Either<_i5.Failure, _i15.User>>.empty(),
+          )
+          as _i4.Stream<_i2.Either<_i5.Failure, _i15.User>>);
+}
+
 /// A class which mocks [WorkflowValidationService].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockWorkflowValidationService extends _i1.Mock
-    implements _i14.WorkflowValidationService {
+    implements _i17.WorkflowValidationService {
   MockWorkflowValidationService() {
     _i1.throwOnMissingStub(this);
   }
@@ -789,7 +1088,7 @@ class MockWorkflowValidationService extends _i1.Mock
 
   @override
   bool validateAnalyticsIntegrity({
-    required _i16.KitchenMetric? metric,
+    required _i18.KitchenMetric? metric,
     required List<_i6.Order>? relatedOrders,
   }) =>
       (super.noSuchMethod(
@@ -800,4 +1099,67 @@ class MockWorkflowValidationService extends _i1.Mock
             returnValue: false,
           )
           as bool);
+}
+
+/// A class which mocks [KitchenConfig].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockKitchenConfig extends _i1.Mock implements _i19.KitchenConfig {
+  MockKitchenConfig() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  int get maxConcurrentOrdersLimit =>
+      (super.noSuchMethod(
+            Invocation.getter(#maxConcurrentOrdersLimit),
+            returnValue: 0,
+          )
+          as int);
+
+  @override
+  int get maxPreparationTime =>
+      (super.noSuchMethod(
+            Invocation.getter(#maxPreparationTime),
+            returnValue: 0,
+          )
+          as int);
+
+  @override
+  int get minimumStaff =>
+      (super.noSuchMethod(Invocation.getter(#minimumStaff), returnValue: 0)
+          as int);
+
+  @override
+  bool isApproachingCapacity(int? currentOrders) =>
+      (super.noSuchMethod(
+            Invocation.method(#isApproachingCapacity, [currentOrders]),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool isAtCriticalCapacity(int? currentOrders) =>
+      (super.noSuchMethod(
+            Invocation.method(#isAtCriticalCapacity, [currentOrders]),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  String getCapacityRecommendation(int? currentOrders, int? availableStaff) =>
+      (super.noSuchMethod(
+            Invocation.method(#getCapacityRecommendation, [
+              currentOrders,
+              availableStaff,
+            ]),
+            returnValue: _i20.dummyValue<String>(
+              this,
+              Invocation.method(#getCapacityRecommendation, [
+                currentOrders,
+                availableStaff,
+              ]),
+            ),
+          )
+          as String);
 }

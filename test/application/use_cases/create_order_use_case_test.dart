@@ -9,13 +9,21 @@ import 'package:stacks/domain/entities/recipe.dart';
 import 'package:stacks/domain/failures/failures.dart';
 import 'package:stacks/domain/repositories/order_repository.dart';
 import 'package:stacks/domain/repositories/recipe_repository.dart';
+import 'package:stacks/domain/repositories/user_repository.dart';
 import 'package:stacks/domain/services/workflow_validation_service.dart';
 import 'package:stacks/domain/value_objects/money.dart';
 import 'package:stacks/domain/value_objects/priority.dart';
 import 'package:stacks/domain/value_objects/time.dart';
 import 'package:stacks/domain/value_objects/user_id.dart';
+import 'package:stacks/application/config/kitchen_config.dart';
 
-@GenerateMocks([OrderRepository, RecipeRepository, WorkflowValidationService])
+@GenerateMocks([
+  OrderRepository,
+  RecipeRepository,
+  UserRepository,
+  WorkflowValidationService,
+  KitchenConfig,
+])
 import 'create_order_use_case_test.mocks.dart';
 
 void main() {
@@ -23,20 +31,42 @@ void main() {
     late CreateOrderUseCase useCase;
     late MockOrderRepository mockOrderRepository;
     late MockRecipeRepository mockRecipeRepository;
+    late MockUserRepository mockUserRepository;
     late MockWorkflowValidationService mockWorkflowValidator;
+    late MockKitchenConfig mockKitchenConfig;
 
     setUp(() {
       mockOrderRepository = MockOrderRepository();
       mockRecipeRepository = MockRecipeRepository();
+      mockUserRepository = MockUserRepository();
       mockWorkflowValidator = MockWorkflowValidationService();
+      mockKitchenConfig = MockKitchenConfig();
       useCase = CreateOrderUseCase(
         mockOrderRepository,
         mockRecipeRepository,
+        mockUserRepository,
         mockWorkflowValidator,
+        mockKitchenConfig,
       );
     });
 
     group('execute', () {
+      setUp(() {
+        // Setup default mock behaviors
+        when(
+          mockOrderRepository.getActiveOrders(),
+        ).thenAnswer((_) async => const Right([]));
+        when(
+          mockUserRepository.getActiveUsers(),
+        ).thenAnswer((_) async => const Right([]));
+        when(mockKitchenConfig.maxConcurrentOrdersLimit).thenReturn(15);
+        when(mockKitchenConfig.maxPreparationTime).thenReturn(120);
+        when(mockKitchenConfig.isAtCriticalCapacity(any)).thenReturn(false);
+        when(
+          mockKitchenConfig.getCapacityRecommendation(any, any),
+        ).thenReturn('Normal operations - accepting new orders');
+      });
+
       test('should create order successfully with valid data', () async {
         // Arrange
         final customerId = UserId('customer123');
