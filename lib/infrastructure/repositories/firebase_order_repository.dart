@@ -1,6 +1,7 @@
-// Firebase Order Repository Implementation - Stub Implementation for Compilation
-// This is a minimal implementation to fix compilation errors
+// Firebase Order Repository Implementation - Production Ready
+// Real Firestore implementation for order management and kitchen operations
 
+import 'dart:developer' as developer;
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,29 +13,53 @@ import '../../domain/value_objects/user_id.dart';
 import '../../domain/value_objects/order_status.dart';
 import '../../domain/value_objects/priority.dart';
 import '../mappers/order_mapper.dart';
+import '../config/firebase_config.dart';
 
-@Injectable(as: OrderRepository)
+@LazySingleton(as: OrderRepository)
 class FirebaseOrderRepository implements OrderRepository {
-  final FirebaseFirestore _firestore;
   final OrderMapper _mapper;
 
-  const FirebaseOrderRepository({
-    required FirebaseFirestore firestore,
-    required OrderMapper mapper,
-  }) : _firestore = firestore,
-       _mapper = mapper;
+  FirebaseOrderRepository(this._mapper);
+
+  FirebaseFirestore get _firestore => FirebaseConfig.firestore;
 
   @override
   Future<Either<Failure, domain.Order>> createOrder(domain.Order order) async {
     try {
+      developer.log(
+        'Creating order: ${order.id.value}',
+        name: 'OrderRepository',
+      );
+
+      final batch = _firestore.batch();
+      final orderRef = _firestore.collection('orders').doc(order.id.value);
+
+      // Convert order to Firestore data
       final orderData = _mapper.toFirestore(order);
-      final docRef = _firestore.collection('orders').doc(order.id.value);
+      batch.set(orderRef, orderData);
 
-      await docRef.set(orderData);
+      // Add order items as subcollection
+      for (final item in order.items) {
+        final itemRef = orderRef.collection('items').doc(item.id.value);
+        final itemData = _mapper.orderItemToFirestore(item);
+        batch.set(itemRef, itemData);
+      }
 
-      // Return the order with confirmation of creation
+      // Commit the batch
+      await batch.commit();
+
+      developer.log(
+        'Successfully created order: ${order.id.value}',
+        name: 'OrderRepository',
+      );
       return Right(order);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to create order: ${order.id.value}',
+        name: 'OrderRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Left(ServerFailure('Failed to create order: ${e.toString()}'));
     }
   }
@@ -112,9 +137,45 @@ class FirebaseOrderRepository implements OrderRepository {
     OrderStatus status,
   ) async {
     try {
-      // Stub implementation
-      return const Right([]);
-    } catch (e) {
+      developer.log(
+        'Getting orders by status: ${status.value}',
+        name: 'OrderRepository',
+      );
+
+      final querySnapshot = await _firestore
+          .collection('orders')
+          .where('status', isEqualTo: status.value)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      final orders = <domain.Order>[];
+
+      for (final doc in querySnapshot.docs) {
+        final itemsSnapshot = await _firestore
+            .collection('orders')
+            .doc(doc.id)
+            .collection('items')
+            .get();
+
+        final items = itemsSnapshot.docs
+            .map(
+              (itemDoc) =>
+                  _mapper.orderItemFromFirestore(itemDoc.data(), itemDoc.id),
+            )
+            .toList();
+
+        final order = _mapper.fromFirestore(doc.data(), doc.id, items);
+        orders.add(order);
+      }
+
+      return Right(orders);
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to get orders by status: ${status.value}',
+        name: 'OrderRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Left(
         ServerFailure('Failed to get orders by status: ${e.toString()}'),
       );
@@ -152,9 +213,43 @@ class FirebaseOrderRepository implements OrderRepository {
   @override
   Future<Either<Failure, List<domain.Order>>> getActiveOrders() async {
     try {
-      // Stub implementation
-      return const Right([]);
-    } catch (e) {
+      developer.log('Getting active orders', name: 'OrderRepository');
+
+      final querySnapshot = await _firestore
+          .collection('orders')
+          .where('status', whereIn: ['confirmed', 'preparing', 'ready'])
+          .orderBy('priority', descending: true)
+          .orderBy('createdAt')
+          .get();
+
+      final orders = <domain.Order>[];
+
+      for (final doc in querySnapshot.docs) {
+        final itemsSnapshot = await _firestore
+            .collection('orders')
+            .doc(doc.id)
+            .collection('items')
+            .get();
+
+        final items = itemsSnapshot.docs
+            .map(
+              (itemDoc) =>
+                  _mapper.orderItemFromFirestore(itemDoc.data(), itemDoc.id),
+            )
+            .toList();
+
+        final order = _mapper.fromFirestore(doc.data(), doc.id, items);
+        orders.add(order);
+      }
+
+      return Right(orders);
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to get active orders',
+        name: 'OrderRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Left(
         ServerFailure('Failed to get active orders: ${e.toString()}'),
       );
@@ -323,9 +418,42 @@ class FirebaseOrderRepository implements OrderRepository {
   @override
   Future<Either<Failure, List<domain.Order>>> getPendingOrders() async {
     try {
-      // Stub implementation
-      return const Right([]);
-    } catch (e) {
+      developer.log('Getting pending orders', name: 'OrderRepository');
+
+      final querySnapshot = await _firestore
+          .collection('orders')
+          .where('status', isEqualTo: 'pending')
+          .orderBy('createdAt')
+          .get();
+
+      final orders = <domain.Order>[];
+
+      for (final doc in querySnapshot.docs) {
+        final itemsSnapshot = await _firestore
+            .collection('orders')
+            .doc(doc.id)
+            .collection('items')
+            .get();
+
+        final items = itemsSnapshot.docs
+            .map(
+              (itemDoc) =>
+                  _mapper.orderItemFromFirestore(itemDoc.data(), itemDoc.id),
+            )
+            .toList();
+
+        final order = _mapper.fromFirestore(doc.data(), doc.id, items);
+        orders.add(order);
+      }
+
+      return Right(orders);
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to get pending orders',
+        name: 'OrderRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Left(
         ServerFailure('Failed to get pending orders: ${e.toString()}'),
       );
@@ -381,8 +509,49 @@ class FirebaseOrderRepository implements OrderRepository {
   @override
   Stream<Either<Failure, List<domain.Order>>> watchOrders() {
     try {
-      // Stub implementation
-      return Stream.value(const Right([]));
+      developer.log('Starting to watch all orders', name: 'OrderRepository');
+
+      return _firestore
+          .collection('orders')
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .asyncMap((snapshot) async {
+            try {
+              final orders = <domain.Order>[];
+
+              for (final doc in snapshot.docs) {
+                final itemsSnapshot = await _firestore
+                    .collection('orders')
+                    .doc(doc.id)
+                    .collection('items')
+                    .get();
+
+                final items = itemsSnapshot.docs
+                    .map(
+                      (itemDoc) => _mapper.orderItemFromFirestore(
+                        itemDoc.data(),
+                        itemDoc.id,
+                      ),
+                    )
+                    .toList();
+
+                final order = _mapper.fromFirestore(doc.data(), doc.id, items);
+                orders.add(order);
+              }
+
+              return Right(orders) as Either<Failure, List<domain.Order>>;
+            } catch (e, stackTrace) {
+              developer.log(
+                'Error in watchOrders stream',
+                name: 'OrderRepository',
+                error: e,
+                stackTrace: stackTrace,
+              );
+              return Left(
+                ServerFailure('Failed to watch orders: ${e.toString()}'),
+              );
+            }
+          });
     } catch (e) {
       return Stream.value(
         Left(ServerFailure('Failed to watch orders: ${e.toString()}')),
@@ -393,12 +562,64 @@ class FirebaseOrderRepository implements OrderRepository {
   @override
   Stream<Either<Failure, domain.Order>> watchOrder(UserId orderId) {
     try {
-      // Stub implementation
-      return Stream.value(Left(ServerFailure('Order not found')));
-    } catch (e) {
-      return Stream.value(
-        Left(ServerFailure('Failed to watch order: ${e.toString()}')),
+      developer.log(
+        'Starting to watch order: ${orderId.value}',
+        name: 'OrderRepository',
       );
+
+      return _firestore
+          .collection('orders')
+          .doc(orderId.value)
+          .snapshots()
+          .asyncMap((docSnapshot) async {
+            try {
+              if (!docSnapshot.exists) {
+                return Left(
+                  NotFoundFailure('Order not found: ${orderId.value}'),
+                );
+              }
+
+              final itemsSnapshot = await _firestore
+                  .collection('orders')
+                  .doc(orderId.value)
+                  .collection('items')
+                  .get();
+
+              final items = itemsSnapshot.docs
+                  .map(
+                    (itemDoc) => _mapper.orderItemFromFirestore(
+                      itemDoc.data(),
+                      itemDoc.id,
+                    ),
+                  )
+                  .toList();
+
+              final order = _mapper.fromFirestore(
+                docSnapshot.data()!,
+                orderId.value,
+                items,
+              );
+              return Right(order) as Either<Failure, domain.Order>;
+            } catch (e, stackTrace) {
+              developer.log(
+                'Error in watchOrder stream for: ${orderId.value}',
+                name: 'OrderRepository',
+                error: e,
+                stackTrace: stackTrace,
+              );
+              return Left(
+                ServerFailure('Failed to watch order: ${e.toString()}'),
+              );
+            }
+          });
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to create watchOrder stream for: ${orderId.value}',
+        name: 'OrderRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return Stream.value(Left(ServerFailure('Failed to watch order: $e')));
     }
   }
 }

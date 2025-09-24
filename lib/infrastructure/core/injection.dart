@@ -17,7 +17,8 @@ import '../mappers/cost_tracking_mapper.dart';
 
 // Import all repositories
 import '../repositories/firebase_user_repository.dart';
-import '../repositories/station_repository_impl.dart';
+import '../repositories/firebase_order_repository.dart';
+import '../repositories/firebase_station_repository.dart';
 import '../repositories/recipe_repository_impl.dart';
 import '../repositories/inventory_repository_impl.dart';
 import '../repositories/table_repository_impl.dart';
@@ -25,7 +26,6 @@ import '../repositories/analytics_repository_impl.dart';
 import '../repositories/kitchen_timer_repository_impl.dart';
 import '../repositories/food_safety_repository_impl.dart';
 import '../repositories/cost_tracking_repository_impl.dart';
-import '../repositories/order_repository_impl.dart';
 
 // Import domain repository interfaces
 import '../../domain/repositories/user_repository.dart';
@@ -64,11 +64,11 @@ Future<void> setupDependencyInjection() async {
   );
 
   getIt.registerLazySingleton<OrderRepository>(
-    () => OrderRepositoryImpl(orderMapper: getIt<OrderMapper>()),
+    () => FirebaseOrderRepository(getIt<OrderMapper>()),
   );
 
   getIt.registerLazySingleton<StationRepository>(
-    () => StationRepositoryImpl(stationMapper: getIt<StationMapper>()),
+    () => FirebaseStationRepository(getIt<StationMapper>()),
   );
 
   getIt.registerLazySingleton<RecipeRepository>(
