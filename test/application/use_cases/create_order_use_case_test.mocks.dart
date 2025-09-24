@@ -7,12 +7,16 @@ import 'dart:async' as _i4;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:stacks/domain/entities/analytics.dart' as _i16;
 import 'package:stacks/domain/entities/order.dart' as _i6;
 import 'package:stacks/domain/entities/order_item.dart' as _i10;
 import 'package:stacks/domain/entities/recipe.dart' as _i12;
+import 'package:stacks/domain/entities/user.dart' as _i15;
 import 'package:stacks/domain/failures/failures.dart' as _i5;
 import 'package:stacks/domain/repositories/order_repository.dart' as _i3;
 import 'package:stacks/domain/repositories/recipe_repository.dart' as _i11;
+import 'package:stacks/domain/services/workflow_validation_service.dart'
+    as _i14;
 import 'package:stacks/domain/value_objects/money.dart' as _i13;
 import 'package:stacks/domain/value_objects/order_status.dart' as _i8;
 import 'package:stacks/domain/value_objects/priority.dart' as _i9;
@@ -724,4 +728,76 @@ class MockRecipeRepository extends _i1.Mock implements _i11.RecipeRepository {
                 _i4.Stream<_i2.Either<_i5.Failure, _i12.Recipe>>.empty(),
           )
           as _i4.Stream<_i2.Either<_i5.Failure, _i12.Recipe>>);
+}
+
+/// A class which mocks [WorkflowValidationService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockWorkflowValidationService extends _i1.Mock
+    implements _i14.WorkflowValidationService {
+  MockWorkflowValidationService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool validateOrderStatusTransition({
+    required _i6.Order? order,
+    required _i8.OrderStatus? newStatus,
+    required _i15.User? requestingUser,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateOrderStatusTransition, [], {
+              #order: order,
+              #newStatus: newStatus,
+              #requestingUser: requestingUser,
+            }),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool validateKitchenCapacity({
+    required List<_i6.Order>? currentOrders,
+    required List<_i15.User>? availableStaff,
+    required int? maxConcurrentOrders,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateKitchenCapacity, [], {
+              #currentOrders: currentOrders,
+              #availableStaff: availableStaff,
+              #maxConcurrentOrders: maxConcurrentOrders,
+            }),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool validateSpecialHandlingRequirements({
+    required _i6.Order? order,
+    required _i15.User? assignedChef,
+    required List<String>? availableEquipment,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateSpecialHandlingRequirements, [], {
+              #order: order,
+              #assignedChef: assignedChef,
+              #availableEquipment: availableEquipment,
+            }),
+            returnValue: false,
+          )
+          as bool);
+
+  @override
+  bool validateAnalyticsIntegrity({
+    required _i16.KitchenMetric? metric,
+    required List<_i6.Order>? relatedOrders,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#validateAnalyticsIntegrity, [], {
+              #metric: metric,
+              #relatedOrders: relatedOrders,
+            }),
+            returnValue: false,
+          )
+          as bool);
 }

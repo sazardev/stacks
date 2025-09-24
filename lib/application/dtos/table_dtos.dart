@@ -178,3 +178,19 @@ class TableReservationDto extends Equatable {
     notes,
   ];
 }
+
+/// DTO for updating table status
+class UpdateTableStatusDto extends Equatable {
+  final UserId tableId;
+  final TableStatus newStatus;
+  final String? reason;
+
+  const UpdateTableStatusDto({
+    required this.tableId,
+    required this.newStatus,
+    this.reason,
+  });
+
+  @override
+  List<Object?> get props => [tableId, newStatus, reason];
+}

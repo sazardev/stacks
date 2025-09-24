@@ -187,3 +187,33 @@ class StationQueryDto extends Equatable {
   @override
   List<Object?> get props => [type, status, isActive, maxCapacity, minCapacity];
 }
+
+/// DTO for updating station status
+class UpdateStationStatusDto extends Equatable {
+  final UserId stationId;
+  final StationStatus newStatus;
+  final String? reason;
+
+  const UpdateStationStatusDto({
+    required this.stationId,
+    required this.newStatus,
+    this.reason,
+  });
+
+  @override
+  List<Object?> get props => [stationId, newStatus, reason];
+}
+
+/// DTO for assigning staff to station
+class AssignStaffToStationDto extends Equatable {
+  final UserId stationId;
+  final List<UserId> staffIds;
+
+  const AssignStaffToStationDto({
+    required this.stationId,
+    required this.staffIds,
+  });
+
+  @override
+  List<Object?> get props => [stationId, staffIds];
+}

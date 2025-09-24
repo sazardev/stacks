@@ -3,18 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:stacks/application/dtos/order_dtos.dart';
-import 'package:stacks/application/use_cases/create_order_use_case.dart';
+import 'package:stacks/application/use_cases/order/create_order_use_case.dart';
 import 'package:stacks/domain/entities/order.dart' as domain;
 import 'package:stacks/domain/entities/recipe.dart';
 import 'package:stacks/domain/failures/failures.dart';
 import 'package:stacks/domain/repositories/order_repository.dart';
 import 'package:stacks/domain/repositories/recipe_repository.dart';
+import 'package:stacks/domain/services/workflow_validation_service.dart';
 import 'package:stacks/domain/value_objects/money.dart';
 import 'package:stacks/domain/value_objects/priority.dart';
 import 'package:stacks/domain/value_objects/time.dart';
 import 'package:stacks/domain/value_objects/user_id.dart';
 
-@GenerateMocks([OrderRepository, RecipeRepository])
+@GenerateMocks([OrderRepository, RecipeRepository, WorkflowValidationService])
 import 'create_order_use_case_test.mocks.dart';
 
 void main() {
@@ -22,13 +23,16 @@ void main() {
     late CreateOrderUseCase useCase;
     late MockOrderRepository mockOrderRepository;
     late MockRecipeRepository mockRecipeRepository;
+    late MockWorkflowValidationService mockWorkflowValidator;
 
     setUp(() {
       mockOrderRepository = MockOrderRepository();
       mockRecipeRepository = MockRecipeRepository();
+      mockWorkflowValidator = MockWorkflowValidationService();
       useCase = CreateOrderUseCase(
-        orderRepository: mockOrderRepository,
-        recipeRepository: mockRecipeRepository,
+        mockOrderRepository,
+        mockRecipeRepository,
+        mockWorkflowValidator,
       );
     });
 
@@ -161,8 +165,8 @@ void main() {
         expect(result.isLeft(), isTrue);
 
         result.fold((failure) {
-          expect(failure, isA<NotFoundFailure>());
-          expect(failure.message, equals('Recipe not found'));
+          expect(failure, isA<ValidationFailure>());
+          expect(failure.message, contains('Recipe not found'));
         }, (order) => fail('Expected failure but got success'));
 
         verify(mockRecipeRepository.getRecipeById(invalidRecipeId)).called(1);
@@ -236,7 +240,7 @@ void main() {
           expect(failure, isA<ValidationFailure>());
           expect(
             failure.message,
-            contains('Order must have at least one item'),
+            contains('Order must contain at least one item'),
           );
         }, (order) => fail('Expected failure but got success'));
 
@@ -260,6 +264,27 @@ void main() {
           priority: Priority.createMedium(),
         );
 
+        // Create a mock recipe for validation
+        final mockRecipe = Recipe(
+          id: recipeId,
+          name: 'Test Recipe',
+          category: RecipeCategory.main,
+          difficulty: RecipeDifficulty.easy,
+          preparationTimeMinutes: 5,
+          cookingTimeMinutes: 10,
+          ingredients: [
+            Ingredient(name: 'Test Ingredient', quantity: '1 piece'),
+          ],
+          instructions: ['Test instruction'],
+          price: Money(10.00),
+          createdAt: Time.now(),
+        );
+
+        // Mock recipe exists (it will be called before quantity validation)
+        when(
+          mockRecipeRepository.getRecipeById(recipeId),
+        ).thenAnswer((_) async => Right(mockRecipe));
+
         // Act
         final result = await useCase.execute(createOrderDto);
 
@@ -268,10 +293,13 @@ void main() {
 
         result.fold((failure) {
           expect(failure, isA<ValidationFailure>());
-          expect(failure.message, contains('Invalid quantity'));
+          expect(
+            failure.message,
+            contains('Item quantity must be greater than 0'),
+          );
         }, (order) => fail('Expected failure but got success'));
 
-        verifyNever(mockRecipeRepository.getRecipeById(any));
+        verify(mockRecipeRepository.getRecipeById(recipeId)).called(1);
         verifyNever(mockOrderRepository.createOrder(any));
       });
     });

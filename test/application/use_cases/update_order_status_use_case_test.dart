@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart' show Right, Left;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:stacks/application/dtos/order_dtos.dart';
-import 'package:stacks/application/use_cases/update_order_status_use_case.dart';
+import 'package:stacks/application/use_cases/order/update_order_status_use_case.dart';
 import 'package:stacks/domain/entities/order.dart' as domain;
 import 'package:stacks/domain/entities/order_item.dart';
 import 'package:stacks/domain/entities/recipe.dart';
@@ -23,7 +23,7 @@ void main() {
 
     setUp(() {
       mockOrderRepository = MockOrderRepository();
-      useCase = UpdateOrderStatusUseCase(orderRepository: mockOrderRepository);
+      useCase = UpdateOrderStatusUseCase(mockOrderRepository);
     });
 
     group('execute', () {
@@ -73,7 +73,10 @@ void main() {
           mockOrderRepository.getOrderById(orderId),
         ).thenAnswer((_) async => Right(existingOrder));
         when(
-          mockOrderRepository.updateOrder(any),
+          mockOrderRepository.updateOrderStatus(
+            orderId,
+            OrderStatus.confirmed(),
+          ),
         ).thenAnswer((_) async => Right(updatedOrder));
 
         // Act
@@ -114,7 +117,7 @@ void main() {
 
         result.fold((failure) {
           expect(failure, isA<NotFoundFailure>());
-          expect(failure.message, equals('Order not found'));
+          expect(failure.message, equals('Order not found: order123'));
         }, (order) => fail('Expected failure but got success'));
 
         verify(mockOrderRepository.getOrderById(orderId)).called(1);
