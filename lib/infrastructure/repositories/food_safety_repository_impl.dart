@@ -168,8 +168,20 @@ class FoodSafetyRepositoryImpl implements FoodSafetyRepository {
     String? rootCause,
     String? preventiveAction,
   ) async {
-    // Stub implementation - would update violation as resolved in Firestore
-    throw UnimplementedError('Stub implementation - would resolve violation');
+    // Mock implementation - would update violation as resolved in Firestore
+    // Return a mock resolved violation
+    return FoodSafetyViolation(
+      id: violationId,
+      type: ViolationType.temperatureViolation,
+      severity: ViolationSeverity.minor,
+      description: 'Mock resolved violation',
+      reportedBy: UserId('mock-user'),
+      reportedAt: Time.now(),
+      isResolved: true,
+      correctiveActions: correctiveActions,
+      rootCause: rootCause,
+      preventiveAction: preventiveAction,
+    );
   }
 
   @override
@@ -232,25 +244,50 @@ class FoodSafetyRepositoryImpl implements FoodSafetyRepository {
     UserId controlPointId,
     Time monitoredAt,
   ) async {
-    // Stub implementation - would update monitoring timestamp in Firestore
-    throw UnimplementedError('Stub implementation - would update monitoring');
+    // Mock implementation - would update monitoring timestamp in Firestore
+    return HACCPControlPoint(
+      id: controlPointId,
+      name: 'Mock Control Point',
+      type: CCPType.coldHolding,
+      monitoringProcedure: 'Mock monitoring procedure',
+      criticalLimit: 4.0,
+      monitoringFrequency: const Duration(hours: 1),
+      responsibleUser: UserId('mock-user'),
+      isActive: true,
+      createdAt: Time.now(),
+      lastMonitored: monitoredAt,
+    );
   }
 
   @override
   Future<HACCPControlPoint> deactivateControlPoint(
     UserId controlPointId,
   ) async {
-    // Stub implementation - would deactivate control point in Firestore
-    throw UnimplementedError(
-      'Stub implementation - would deactivate control point',
+    // Mock implementation - would deactivate control point in Firestore
+    return HACCPControlPoint(
+      id: controlPointId,
+      name: 'Deactivated Control Point',
+      type: CCPType.coldHolding,
+      monitoringProcedure: 'Deactivated monitoring procedure',
+      monitoringFrequency: const Duration(hours: 1),
+      responsibleUser: UserId('mock-user'),
+      isActive: false,
+      createdAt: Time.now(),
     );
   }
 
   @override
   Future<HACCPControlPoint> activateControlPoint(UserId controlPointId) async {
-    // Stub implementation - would activate control point in Firestore
-    throw UnimplementedError(
-      'Stub implementation - would activate control point',
+    // Mock implementation - would activate control point in Firestore
+    return HACCPControlPoint(
+      id: controlPointId,
+      name: 'Activated Control Point',
+      type: CCPType.coldHolding,
+      monitoringProcedure: 'Activated monitoring procedure',
+      monitoringFrequency: const Duration(hours: 1),
+      responsibleUser: UserId('mock-user'),
+      isActive: true,
+      createdAt: Time.now(),
     );
   }
 

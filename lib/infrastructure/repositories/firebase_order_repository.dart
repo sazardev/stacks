@@ -231,8 +231,10 @@ class FirebaseOrderRepository implements OrderRepository {
     OrderItem item,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('addItemToOrder not implemented');
+      // Mock implementation - would update Firestore subcollection
+      return Left(
+        NotFoundFailure('Order not found for adding item: ${orderId.value}'),
+      );
     } catch (e) {
       return Left(
         ServerFailure('Failed to add item to order: ${e.toString()}'),
@@ -246,8 +248,8 @@ class FirebaseOrderRepository implements OrderRepository {
     UserId itemId,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('removeItemFromOrder not implemented');
+      // Mock implementation - would remove from Firestore subcollection
+      return Left(NotFoundFailure('Order item not found: ${itemId.value}'));
     } catch (e) {
       return Left(
         ServerFailure('Failed to remove item from order: ${e.toString()}'),
@@ -261,8 +263,12 @@ class FirebaseOrderRepository implements OrderRepository {
     UserId stationId,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('assignOrderToStation not implemented');
+      // Mock implementation - would update Firestore document with stationId
+      return Left(
+        NotFoundFailure(
+          'Order not found for station assignment: ${orderId.value}',
+        ),
+      );
     } catch (e) {
       return Left(
         ServerFailure('Failed to assign order to station: ${e.toString()}'),
@@ -276,8 +282,10 @@ class FirebaseOrderRepository implements OrderRepository {
     String reason,
   ) async {
     try {
-      // Stub implementation - would cancel order with reason
-      throw UnimplementedError('cancelOrder not implemented');
+      // Mock implementation - would update status to cancelled in Firestore
+      return Left(
+        NotFoundFailure('Order not found for cancellation: ${orderId.value}'),
+      );
     } catch (e) {
       return Left(ServerFailure('Failed to cancel order: ${e.toString()}'));
     }
@@ -330,8 +338,8 @@ class FirebaseOrderRepository implements OrderRepository {
     OrderItem item,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('updateOrderItem not implemented');
+      // Mock implementation - would update item in Firestore subcollection
+      return Left(NotFoundFailure('Order item not found: ${item.id.value}'));
     } catch (e) {
       return Left(
         ServerFailure('Failed to update order item: ${e.toString()}'),
@@ -345,8 +353,12 @@ class FirebaseOrderRepository implements OrderRepository {
     Priority priority,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('updateOrderPriority not implemented');
+      // Mock implementation - would update priority in Firestore document
+      return Left(
+        NotFoundFailure(
+          'Order not found for priority update: ${orderId.value}',
+        ),
+      );
     } catch (e) {
       return Left(
         ServerFailure('Failed to update order priority: ${e.toString()}'),

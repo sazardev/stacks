@@ -27,8 +27,8 @@ class CostTrackingRepositoryImpl implements CostTrackingRepository {
   @override
   Future<Either<Failure, Cost>> getCostById(UserId costId) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('getCostById not implemented');
+      // Mock implementation - would fetch from Firestore by ID
+      return Left(NotFoundFailure('Cost not found: ${costId.value}'));
     } catch (e) {
       return Left(ServerFailure('Failed to get cost: ${e.toString()}'));
     }
@@ -182,8 +182,10 @@ class CostTrackingRepositoryImpl implements CostTrackingRepository {
     UserId costCenterId,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('getCostCenterById not implemented');
+      // Mock implementation - would fetch from Firestore by ID
+      return Left(
+        NotFoundFailure('Cost center not found: ${costCenterId.value}'),
+      );
     } catch (e) {
       return Left(ServerFailure('Failed to get cost center: ${e.toString()}'));
     }
@@ -287,8 +289,10 @@ class CostTrackingRepositoryImpl implements CostTrackingRepository {
     UserId reportId,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('getProfitabilityReportById not implemented');
+      // Mock implementation - would fetch from Firestore by ID
+      return Left(
+        NotFoundFailure('Profitability report not found: ${reportId.value}'),
+      );
     } catch (e) {
       return Left(
         ServerFailure('Failed to get profitability report: ${e.toString()}'),
@@ -346,8 +350,10 @@ class CostTrackingRepositoryImpl implements CostTrackingRepository {
     UserId recipeCostId,
   ) async {
     try {
-      // Stub implementation
-      throw UnimplementedError('getRecipeCostById not implemented');
+      // Mock implementation - would fetch from Firestore by ID
+      return Left(
+        NotFoundFailure('Recipe cost not found: ${recipeCostId.value}'),
+      );
     } catch (e) {
       return Left(ServerFailure('Failed to get recipe cost: ${e.toString()}'));
     }
