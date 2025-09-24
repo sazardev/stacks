@@ -2,12 +2,14 @@
 // Main dashboard for kitchen operations with order management and station monitoring
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/value_objects/order_status.dart';
 import '../../../domain/value_objects/money.dart';
 import '../../../domain/value_objects/priority.dart';
 import '../../../domain/value_objects/user_id.dart';
-import '../../../domain/value_objects/order_id.dart';
+import '../../../domain/value_objects/time.dart';
+import '../../blocs/order/order_bloc_simple.dart';
 
 /// Kitchen Dashboard - Main operational interface
 /// Shows order queues, station status, and kitchen metrics in real-time

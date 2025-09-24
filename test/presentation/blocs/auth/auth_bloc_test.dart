@@ -7,8 +7,9 @@ import 'package:dartz/dartz.dart';
 import 'package:stacks/presentation/blocs/auth/auth_bloc.dart';
 import 'package:stacks/presentation/blocs/auth/auth_event.dart';
 import 'package:stacks/presentation/blocs/auth/auth_state.dart';
-import 'package:stacks/application/use_cases/user/user_use_cases.dart';
 import 'package:stacks/application/use_cases/user/authenticate_user_use_case.dart';
+import 'package:stacks/application/use_cases/user/user_use_cases.dart'
+    hide AuthenticateUserUseCase, RegisterUserUseCase;
 import 'package:stacks/application/dtos/user_dtos.dart';
 import 'package:stacks/domain/entities/user.dart';
 import 'package:stacks/domain/value_objects/user_id.dart';

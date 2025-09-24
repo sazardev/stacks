@@ -6,8 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/order.dart';
 import '../../../domain/value_objects/order_status.dart';
-import '../../../infrastructure/core/injection.dart';
-import '../../blocs/order/order_bloc.dart';
+import '../../blocs/order/order_bloc_simple.dart';
 import '../../blocs/order/order_event.dart';
 import '../../blocs/order/order_state.dart';
 
@@ -18,7 +17,7 @@ class KitchenDashboardPage extends StatelessWidget {
 
   static Widget create() {
     return BlocProvider<OrderBloc>(
-      create: (context) => getIt<OrderBloc>()..add(LoadOrdersEvent()),
+      create: (context) => OrderBloc()..add(LoadOrdersEvent()),
       child: const KitchenDashboardPage(),
     );
   }

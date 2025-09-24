@@ -3,14 +3,12 @@
 
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:dartz/dartz.dart' hide Order;
 
 import '../../core/base_bloc.dart';
 import 'order_event.dart';
 import 'order_state.dart';
 import '../../../application/use_cases/order/order_use_cases.dart';
 import '../../../domain/entities/order.dart';
-import '../../../domain/failures/failures.dart';
 import '../../../domain/value_objects/order_status.dart';
 
 /// BLoC for managing order operations in the kitchen display system

@@ -1,9 +1,7 @@
 // Presentation Layer Dependency Injection
 // Registers BLoCs, Use Cases, and other presentation layer dependencies
 
-import 'pa    getIt.registerFactory<StationBloc>(
-      () => StationBloc(),
-    );_it/get_it.dart';
+import 'package:get_it/get_it.dart';
 
 // Import use cases
 import '../../application/use_cases/user/user_use_cases.dart'
@@ -21,7 +19,7 @@ import '../../domain/repositories/station_repository.dart';
 // Import BLoCs
 import '../blocs/auth/auth_bloc.dart';
 import '../blocs/order/order_bloc.dart';
-import '../blocs/station/station_bloc_simple.dart';
+import '../blocs/station/station_bloc.dart';
 
 /// Setup presentation layer dependencies
 /// Must be called after infrastructure layer setup
@@ -130,16 +128,7 @@ void setupPresentationDependencies(GetIt getIt) {
   );
 
   // Station BLoC
-  getIt.registerFactory<StationBloc>(
-    () => StationBloc(
-      getAllStationsUseCase: getIt<GetAllStationsUseCase>(),
-      getStationByIdUseCase: getIt<GetStationByIdUseCase>(),
-      createStationUseCase: getIt<CreateStationUseCase>(),
-      updateStationUseCase: getIt<UpdateStationUseCase>(),
-      assignStaffToStationUseCase: getIt<AssignStaffToStationUseCase>(),
-      removeStaffFromStationUseCase: getIt<RemoveStaffFromStationUseCase>(),
-    ),
-  );
+  getIt.registerFactory<StationBloc>(() => StationBloc());
 }
 
 /// Helper getters for BLoCs

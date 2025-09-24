@@ -9,6 +9,7 @@ import 'order_event.dart';
 import 'order_state.dart';
 import '../../../domain/entities/order.dart';
 import '../../../domain/entities/order_item.dart';
+import '../../../domain/entities/recipe.dart';
 import '../../../domain/value_objects/order_status.dart';
 import '../../../domain/value_objects/priority.dart';
 import '../../../domain/value_objects/time.dart';
@@ -111,14 +112,16 @@ class OrderBloc extends BaseBloc<OrderEvent, OrderState> {
   List<Order> _generateMockOrders() {
     return [
       Order(
-        id: UserId.fromString('order-001'),
-        customerId: UserId.fromString('customer-001'),
-        tableId: UserId.fromString('table-01'),
+        id: UserId('order-001'),
+        customerId: UserId('customer-001'),
+        tableId: UserId('table-01'),
         items: [
           OrderItem(
-            recipeId: UserId.fromString('recipe-001'),
+            id: UserId('item-001'),
+            recipe: _getMockRecipe('recipe-001'),
             quantity: 2,
             specialInstructions: 'Medium rare',
+            createdAt: Time.now(),
           ),
         ],
         priority: Priority.createMedium(),
@@ -127,12 +130,22 @@ class OrderBloc extends BaseBloc<OrderEvent, OrderState> {
         createdAt: Time.now(),
       ),
       Order(
-        id: UserId.fromString('order-002'),
-        customerId: UserId.fromString('customer-002'),
-        tableId: UserId.fromString('table-02'),
+        id: UserId('order-002'),
+        customerId: UserId('customer-002'),
+        tableId: UserId('table-02'),
         items: [
-          OrderItem(recipeId: UserId.fromString('recipe-002'), quantity: 1),
-          OrderItem(recipeId: UserId.fromString('recipe-003'), quantity: 1),
+          OrderItem(
+            id: UserId('item-002'),
+            recipe: _getMockRecipe('recipe-002'),
+            quantity: 1,
+            createdAt: Time.now(),
+          ),
+          OrderItem(
+            id: UserId('item-003'),
+            recipe: _getMockRecipe('recipe-003'),
+            quantity: 1,
+            createdAt: Time.now(),
+          ),
         ],
         priority: Priority.createHigh(),
         status: OrderStatus.preparing(),
@@ -148,11 +161,16 @@ class OrderBloc extends BaseBloc<OrderEvent, OrderState> {
         ),
       ),
       Order(
-        id: UserId.fromString('order-003'),
-        customerId: UserId.fromString('customer-003'),
-        tableId: UserId.fromString('table-03'),
+        id: UserId('order-003'),
+        customerId: UserId('customer-003'),
+        tableId: UserId('table-03'),
         items: [
-          OrderItem(recipeId: UserId.fromString('recipe-004'), quantity: 3),
+          OrderItem(
+            id: UserId('item-004'),
+            recipe: _getMockRecipe('recipe-004'),
+            quantity: 3,
+            createdAt: Time.now(),
+          ),
         ],
         priority: Priority.createLow(),
         status: OrderStatus.ready(),
@@ -170,11 +188,16 @@ class OrderBloc extends BaseBloc<OrderEvent, OrderState> {
         ),
       ),
       Order(
-        id: UserId.fromString('order-004'),
-        customerId: UserId.fromString('customer-004'),
-        tableId: UserId.fromString('table-04'),
+        id: UserId('order-004'),
+        customerId: UserId('customer-004'),
+        tableId: UserId('table-04'),
         items: [
-          OrderItem(recipeId: UserId.fromString('recipe-005'), quantity: 1),
+          OrderItem(
+            id: UserId('item-005'),
+            recipe: _getMockRecipe('recipe-005'),
+            quantity: 1,
+            createdAt: Time.now(),
+          ),
         ],
         priority: Priority.createMedium(),
         status: OrderStatus.pending(),
@@ -184,10 +207,15 @@ class OrderBloc extends BaseBloc<OrderEvent, OrderState> {
         ),
       ),
       Order(
-        id: UserId.fromString('order-005'),
-        customerId: UserId.fromString('customer-005'),
+        id: UserId('order-005'),
+        customerId: UserId('customer-005'),
         items: [
-          OrderItem(recipeId: UserId.fromString('recipe-006'), quantity: 2),
+          OrderItem(
+            id: UserId('item-006'),
+            recipe: _getMockRecipe('recipe-006'),
+            quantity: 2,
+            createdAt: Time.now(),
+          ),
         ],
         priority: Priority.createHigh(),
         status: OrderStatus.preparing(),
@@ -202,5 +230,22 @@ class OrderBloc extends BaseBloc<OrderEvent, OrderState> {
         ),
       ),
     ];
+  }
+
+  /// Creates a mock recipe for testing purposes
+  Recipe _getMockRecipe(String recipeId) {
+    return Recipe(
+      id: UserId(recipeId),
+      name: 'Mock Recipe ${recipeId.split('-').last}',
+      description: 'A mock recipe for testing purposes',
+      category: RecipeCategory.main,
+      difficulty: RecipeDifficulty.medium,
+      ingredients: [Ingredient(name: 'Test Ingredient', quantity: '1 cup')],
+      instructions: ['Step 1: Mock preparation'],
+      preparationTimeMinutes: 10,
+      cookingTimeMinutes: 15,
+      price: Money(15.99),
+      createdAt: Time.now(),
+    );
   }
 }

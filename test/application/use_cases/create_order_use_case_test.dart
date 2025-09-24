@@ -100,6 +100,13 @@ void main() {
               invocation.positionalArguments[0] as domain.Order;
           return Right(order);
         });
+        when(
+          mockWorkflowValidator.validateKitchenCapacity(
+            currentOrders: anyNamed('currentOrders'),
+            availableStaff: anyNamed('availableStaff'),
+            maxConcurrentOrders: anyNamed('maxConcurrentOrders'),
+          ),
+        ).thenReturn(true);
 
         // Act
         final result = await useCase.execute(createOrderDto);
@@ -201,6 +208,13 @@ void main() {
         when(
           mockRecipeRepository.getRecipeById(recipeId),
         ).thenAnswer((_) async => Right(recipe));
+        when(
+          mockWorkflowValidator.validateKitchenCapacity(
+            currentOrders: anyNamed('currentOrders'),
+            availableStaff: anyNamed('availableStaff'),
+            maxConcurrentOrders: anyNamed('maxConcurrentOrders'),
+          ),
+        ).thenReturn(true);
         when(
           mockOrderRepository.createOrder(any),
         ).thenAnswer((_) async => const Left(ServerFailure('Database error')));
