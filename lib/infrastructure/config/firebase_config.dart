@@ -1,10 +1,13 @@
 // Firebase Configuration for Restaurant Management System
 // Initializes Firebase services and configures Firestore settings
 
+import 'dart:developer' as developer;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+import '../../firebase_options.dart';
 import 'firebase_collections.dart';
 
 class FirebaseConfig {
@@ -14,19 +17,31 @@ class FirebaseConfig {
 
   /// Initialize Firebase with configuration
   static Future<void> initialize() async {
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        // Replace these with your actual Firebase project configuration
-        apiKey: 'your-api-key',
-        appId: 'your-app-id',
-        messagingSenderId: 'your-sender-id',
-        projectId: 'your-project-id',
-        storageBucket: 'your-storage-bucket',
-      ),
-    );
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
-    // Configure Firestore settings
-    _configureFirestore();
+      developer.log(
+        'Firebase initialized successfully',
+        name: 'FirebaseConfig',
+      );
+
+      // Configure Firestore settings
+      _configureFirestore();
+
+      // Configure Authentication settings
+      _configureAuth();
+
+      // Configure Storage settings
+      _configureStorage();
+    } catch (e) {
+      developer.log(
+        'Firebase initialization failed: $e',
+        name: 'FirebaseConfig',
+      );
+      rethrow;
+    }
   }
 
   /// Configure Firestore with appropriate settings for restaurant operations
@@ -34,13 +49,37 @@ class FirebaseConfig {
     _firestore = FirebaseFirestore.instance;
 
     // Configure Firestore settings for better performance
-    _firestore!.settings = const Settings(
-      persistenceEnabled: true,
-      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-    );
+    if (!kIsWeb) {
+      _firestore!.settings = const Settings(
+        persistenceEnabled: true,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      );
+    }
 
-    // Enable offline persistence for better user experience
-    _firestore!.enableNetwork();
+    developer.log('Firestore configured successfully', name: 'FirebaseConfig');
+  }
+
+  /// Configure Firebase Auth settings
+  static void _configureAuth() {
+    _auth = FirebaseAuth.instance;
+
+    // Set language code for auth operations
+    _auth!.setLanguageCode('en');
+
+    developer.log(
+      'Firebase Auth configured successfully',
+      name: 'FirebaseConfig',
+    );
+  }
+
+  /// Configure Firebase Storage settings
+  static void _configureStorage() {
+    _storage = FirebaseStorage.instance;
+
+    developer.log(
+      'Firebase Storage configured successfully',
+      name: 'FirebaseConfig',
+    );
   }
 
   /// Get Firestore instance
@@ -93,9 +132,15 @@ class FirebaseConfig {
       );
       await _createInitialDocument(firestore, FirebaseCollections.recipeCosts);
 
-      print('Firestore structure initialized successfully');
+      developer.log(
+        'Firestore structure initialized successfully',
+        name: 'FirebaseConfig',
+      );
     } catch (e) {
-      print('Error setting up Firestore structure: $e');
+      developer.log(
+        'Error setting up Firestore structure: $e',
+        name: 'FirebaseConfig',
+      );
     }
   }
 
@@ -118,7 +163,10 @@ class FirebaseConfig {
         });
       }
     } catch (e) {
-      print('Error creating initial document for $collectionName: $e');
+      developer.log(
+        'Error creating initial document for $collectionName: $e',
+        name: 'FirebaseConfig',
+      );
     }
   }
 
@@ -127,20 +175,53 @@ class FirebaseConfig {
     // Note: Composite indexes must be created in Firebase Console
     // or using Firebase CLI. This method documents the required indexes.
 
-    print('Required Firestore Composite Indexes:');
-    print('1. orders: status (ASC), createdAt (DESC)');
-    print('2. orders: stationId (ASC), status (ASC), createdAt (DESC)');
-    print('3. inventory: itemId (ASC), expirationDate (ASC)');
-    print('4. inventory: location (ASC), quantity (ASC)');
-    print('5. costs: incurredDate (ASC), type (ASC)');
-    print('6. costs: costCenterId (ASC), incurredDate (DESC)');
-    print('7. food_safety: facilityId (ASC), recordedAt (DESC)');
-    print('8. kitchen_timers: stationId (ASC), isActive (ASC)');
-    print('9. analytics: reportType (ASC), periodStart (DESC)');
-    print('10. recipe_costs: recipeId (ASC), isCurrentPricing (ASC)');
-    print('');
-    print(
+    developer.log(
+      'Required Firestore Composite Indexes:',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '1. orders: status (ASC), createdAt (DESC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '2. orders: stationId (ASC), status (ASC), createdAt (DESC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '3. inventory: itemId (ASC), expirationDate (ASC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '4. inventory: location (ASC), quantity (ASC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '5. costs: incurredDate (ASC), type (ASC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '6. costs: costCenterId (ASC), incurredDate (DESC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '7. food_safety: facilityId (ASC), recordedAt (DESC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '8. kitchen_timers: stationId (ASC), isActive (ASC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '9. analytics: reportType (ASC), periodStart (DESC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
+      '10. recipe_costs: recipeId (ASC), isCurrentPricing (ASC)',
+      name: 'FirebaseConfig',
+    );
+    developer.log(
       'Create these indexes in Firebase Console under Firestore Database > Indexes',
+      name: 'FirebaseConfig',
     );
   }
 
@@ -156,10 +237,16 @@ class FirebaseConfig {
       // Clean up test document
       await firestore.doc('test/connection').delete();
 
-      print('Firebase connection test successful');
+      developer.log(
+        'Firebase connection test successful',
+        name: 'FirebaseConfig',
+      );
       return true;
     } catch (e) {
-      print('Firebase connection test failed: $e');
+      developer.log(
+        'Firebase connection test failed: $e',
+        name: 'FirebaseConfig',
+      );
       return false;
     }
   }

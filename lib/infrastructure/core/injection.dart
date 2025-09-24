@@ -16,7 +16,7 @@ import '../mappers/food_safety_mapper.dart';
 import '../mappers/cost_tracking_mapper.dart';
 
 // Import all repositories
-import '../repositories/user_repository_impl.dart';
+import '../repositories/firebase_user_repository.dart';
 import '../repositories/station_repository_impl.dart';
 import '../repositories/recipe_repository_impl.dart';
 import '../repositories/inventory_repository_impl.dart';
@@ -58,9 +58,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<FoodSafetyMapper>(() => FoodSafetyMapper());
   getIt.registerLazySingleton<CostTrackingMapper>(() => CostTrackingMapper());
 
-  // Repositories
+  // Repositories - Using Firebase implementations where available
   getIt.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(userMapper: getIt<UserMapper>()),
+    () => FirebaseUserRepository(getIt<UserMapper>()),
   );
 
   getIt.registerLazySingleton<OrderRepository>(

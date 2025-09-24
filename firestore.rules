@@ -1,0 +1,107 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions for authentication and authorization
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isKitchenStaff() {
+      return isAuthenticated() && 
+             resource.data.role in ['line_cook', 'prep_cook', 'sous_chef', 'head_chef', 'kitchen_manager'];
+    }
+    
+    function isManagerOrAbove() {
+      return isAuthenticated() && 
+             resource.data.role in ['sous_chef', 'head_chef', 'kitchen_manager'];
+    }
+    
+    function isValidUserData() {
+      return request.resource.data.keys().hasAll(['email', 'name', 'role', 'createdAt']) &&
+             request.resource.data.role in ['dishwasher', 'line_cook', 'prep_cook', 'sous_chef', 'head_chef', 'kitchen_manager'];
+    }
+
+    // Users collection - users can read/update their own profile
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && isValidUserData();
+      allow create: if isAuthenticated() && isValidUserData();
+    }
+
+    // Orders collection - kitchen staff can read/write orders
+    match /orders/{orderId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isKitchenStaff();
+      allow delete: if isManagerOrAbove();
+    }
+
+    // Stations collection - kitchen staff can read, managers can write
+    match /stations/{stationId} {
+      allow read: if isAuthenticated();
+      allow write: if isManagerOrAbove();
+    }
+
+    // Recipes collection - kitchen staff can read, managers can write
+    match /recipes/{recipeId} {
+      allow read: if isAuthenticated();
+      allow write: if isManagerOrAbove();
+    }
+
+    // Inventory collection - kitchen staff can read/update, managers can create/delete
+    match /inventory/{itemId} {
+      allow read: if isAuthenticated();
+      allow update: if isKitchenStaff();
+      allow create, delete: if isManagerOrAbove();
+    }
+
+    // Tables collection - all authenticated users can read, managers can write
+    match /tables/{tableId} {
+      allow read: if isAuthenticated();
+      allow write: if isManagerOrAbove();
+    }
+
+    // Kitchen timers collection - kitchen staff can read/write
+    match /kitchen_timers/{timerId} {
+      allow read, write: if isKitchenStaff();
+    }
+
+    // Food safety collection - kitchen staff can read/write
+    match /food_safety/{recordId} {
+      allow read, write: if isKitchenStaff();
+    }
+
+    // Cost tracking collections - managers only
+    match /costs/{costId} {
+      allow read, write: if isManagerOrAbove();
+    }
+    
+    match /cost_centers/{centerId} {
+      allow read, write: if isManagerOrAbove();
+    }
+    
+    match /profitability_reports/{reportId} {
+      allow read, write: if isManagerOrAbove();
+    }
+    
+    match /recipe_costs/{costId} {
+      allow read, write: if isManagerOrAbove();
+    }
+
+    // Analytics collection - managers only
+    match /analytics/{analyticsId} {
+      allow read, write: if isManagerOrAbove();
+    }
+
+    // Deny all other requests
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
