@@ -2,12 +2,10 @@
 // Registers all repositories, mappers, and services using GetIt and Injectable
 
 import 'package:get_it/get_it.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 // Import all mappers
 import '../mappers/user_mapper.dart';
+import '../mappers/order_mapper.dart';
 import '../mappers/station_mapper.dart';
 import '../mappers/recipe_mapper.dart';
 import '../mappers/inventory_mapper.dart';
@@ -27,9 +25,11 @@ import '../repositories/analytics_repository_impl.dart';
 import '../repositories/kitchen_timer_repository_impl.dart';
 import '../repositories/food_safety_repository_impl.dart';
 import '../repositories/cost_tracking_repository_impl.dart';
+import '../repositories/order_repository_impl.dart';
 
 // Import domain repository interfaces
 import '../../domain/repositories/user_repository.dart';
+import '../../domain/repositories/order_repository.dart';
 import '../../domain/repositories/station_repository.dart';
 import '../../domain/repositories/recipe_repository.dart';
 import '../../domain/repositories/inventory_repository.dart';
@@ -39,19 +39,16 @@ import '../../domain/repositories/kitchen_timer_repository.dart';
 import '../../domain/repositories/food_safety_repository.dart';
 import '../../domain/repositories/cost_tracking_repository.dart';
 
+// Import presentation layer DI
+import '../../presentation/core/presentation_injection.dart';
+
 final GetIt getIt = GetIt.instance;
 
 // Manual registration for cases where automatic generation might not work
 Future<void> setupDependencyInjection() async {
-  // Firebase services
-  getIt.registerLazySingleton<FirebaseFirestore>(
-    () => FirebaseFirestore.instance,
-  );
-  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-  getIt.registerLazySingleton<FirebaseStorage>(() => FirebaseStorage.instance);
-
   // Mappers
   getIt.registerLazySingleton<UserMapper>(() => UserMapper());
+  getIt.registerLazySingleton<OrderMapper>(() => OrderMapper());
   getIt.registerLazySingleton<StationMapper>(() => StationMapper());
   getIt.registerLazySingleton<RecipeMapper>(() => RecipeMapper());
   getIt.registerLazySingleton<InventoryMapper>(() => InventoryMapper());
@@ -64,6 +61,10 @@ Future<void> setupDependencyInjection() async {
   // Repositories
   getIt.registerLazySingleton<UserRepository>(
     () => UserRepositoryImpl(userMapper: getIt<UserMapper>()),
+  );
+
+  getIt.registerLazySingleton<OrderRepository>(
+    () => OrderRepositoryImpl(orderMapper: getIt<OrderMapper>()),
   );
 
   getIt.registerLazySingleton<StationRepository>(
@@ -97,18 +98,17 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<CostTrackingRepository>(
     () => CostTrackingRepositoryImpl(),
   );
+
+  // Setup presentation layer dependencies (BLoCs and use cases)
+  setupPresentationDependencies(getIt);
 }
 
 // Helper methods to get services
 T get<T extends Object>() => getIt.get<T>();
 
-// Specific getters for common services
-FirebaseFirestore get firestore => getIt<FirebaseFirestore>();
-FirebaseAuth get auth => getIt<FirebaseAuth>();
-FirebaseStorage get storage => getIt<FirebaseStorage>();
-
 // Repository getters
 UserRepository get userRepository => getIt<UserRepository>();
+OrderRepository get orderRepository => getIt<OrderRepository>();
 StationRepository get stationRepository => getIt<StationRepository>();
 RecipeRepository get recipeRepository => getIt<RecipeRepository>();
 InventoryRepository get inventoryRepository => getIt<InventoryRepository>();
