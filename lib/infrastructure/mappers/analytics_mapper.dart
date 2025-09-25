@@ -363,6 +363,127 @@ class AnalyticsMapper {
     }
   }
 
+  /// Converts StaffPerformanceAnalytics entity to Firestore document
+  Map<String, dynamic> staffPerformanceAnalyticsToFirestore(
+    StaffPerformanceAnalytics analytics,
+  ) {
+    return {
+      'id': analytics.id.value,
+      'staffId': analytics.staffId.value,
+      'staffName': analytics.staffName,
+      'role': _userRoleToString(analytics.role),
+      'periodStart': analytics.periodStart.millisecondsSinceEpoch,
+      'periodEnd': analytics.periodEnd.millisecondsSinceEpoch,
+      'ordersCompleted': analytics.ordersCompleted,
+      'averageOrderTime': analytics.averageOrderTime.inMilliseconds,
+      'errorCount': analytics.errorCount,
+      'efficiencyScore': analytics.efficiencyScore,
+      'customersServed': analytics.customersServed,
+      'customerSatisfactionScore': analytics.customerSatisfactionScore,
+      'totalWorkTime': analytics.totalWorkTime.inMilliseconds,
+      'achievements': analytics.achievements,
+      'improvementAreas': analytics.improvementAreas,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    };
+  }
+
+  /// Converts Firestore document to StaffPerformanceAnalytics entity
+  StaffPerformanceAnalytics staffPerformanceAnalyticsFromFirestore(
+    Map<String, dynamic> data,
+    String id,
+  ) {
+    return StaffPerformanceAnalytics(
+      id: UserId(id),
+      staffId: UserId(data['staffId'] as String),
+      staffName: data['staffName'] as String,
+      role: _userRoleFromString(data['role'] as String),
+      periodStart: Time.fromMillisecondsSinceEpoch(data['periodStart'] as int),
+      periodEnd: Time.fromMillisecondsSinceEpoch(data['periodEnd'] as int),
+      ordersCompleted: data['ordersCompleted'] as int,
+      averageOrderTime: Duration(milliseconds: data['averageOrderTime'] as int),
+      errorCount: data['errorCount'] as int,
+      efficiencyScore: (data['efficiencyScore'] as num).toDouble(),
+      customersServed: data['customersServed'] as int,
+      customerSatisfactionScore: (data['customerSatisfactionScore'] as num)
+          .toDouble(),
+      totalWorkTime: Duration(milliseconds: data['totalWorkTime'] as int),
+      achievements: List<String>.from(data['achievements'] ?? []),
+      improvementAreas: List<String>.from(data['improvementAreas'] ?? []),
+    );
+  }
+
+  /// Converts KitchenEfficiencyAnalytics entity to Firestore document
+  Map<String, dynamic> kitchenEfficiencyAnalyticsToFirestore(
+    KitchenEfficiencyAnalytics analytics,
+  ) {
+    return {
+      'id': analytics.id.value,
+      'date': analytics.date.millisecondsSinceEpoch,
+      'stationUtilization': analytics.stationUtilization.map(
+        (key, value) => MapEntry(key.value, value),
+      ),
+      'stationAverageTime': analytics.stationAverageTime.map(
+        (key, value) => MapEntry(key.value, value.inMilliseconds),
+      ),
+      'stationOrderCount': analytics.stationOrderCount.map(
+        (key, value) => MapEntry(key.value, value),
+      ),
+      'overallEfficiency': analytics.overallEfficiency,
+      'averageOrderTime': analytics.averageOrderTime.inMilliseconds,
+      'peakHourAverageTime': analytics.peakHourAverageTime.inMilliseconds,
+      'bottleneckStationCount': analytics.bottleneckStationCount,
+      'bottleneckStations': analytics.bottleneckStations
+          .map((id) => id.value)
+          .toList(),
+      'capacityUtilization': analytics.capacityUtilization,
+      'efficiencyIssues': analytics.efficiencyIssues,
+      'optimizationSuggestions': analytics.optimizationSuggestions,
+      'createdAt': DateTime.now().millisecondsSinceEpoch,
+    };
+  }
+
+  /// Converts Firestore document to KitchenEfficiencyAnalytics entity
+  KitchenEfficiencyAnalytics kitchenEfficiencyAnalyticsFromFirestore(
+    Map<String, dynamic> data,
+    String id,
+  ) {
+    final stationUtilizationData =
+        data['stationUtilization'] as Map<String, dynamic>? ?? {};
+    final stationAverageTimeData =
+        data['stationAverageTime'] as Map<String, dynamic>? ?? {};
+    final stationOrderCountData =
+        data['stationOrderCount'] as Map<String, dynamic>? ?? {};
+
+    return KitchenEfficiencyAnalytics(
+      id: UserId(id),
+      date: Time.fromMillisecondsSinceEpoch(data['date'] as int),
+      stationUtilization: stationUtilizationData.map(
+        (key, value) => MapEntry(UserId(key), (value as num).toDouble()),
+      ),
+      stationAverageTime: stationAverageTimeData.map(
+        (key, value) =>
+            MapEntry(UserId(key), Duration(milliseconds: value as int)),
+      ),
+      stationOrderCount: stationOrderCountData.map(
+        (key, value) => MapEntry(UserId(key), value as int),
+      ),
+      overallEfficiency: (data['overallEfficiency'] as num).toDouble(),
+      averageOrderTime: Duration(milliseconds: data['averageOrderTime'] as int),
+      peakHourAverageTime: Duration(
+        milliseconds: data['peakHourAverageTime'] as int,
+      ),
+      bottleneckStationCount: data['bottleneckStationCount'] as int,
+      bottleneckStations: (data['bottleneckStations'] as List<dynamic>? ?? [])
+          .map((id) => UserId(id as String))
+          .toList(),
+      capacityUtilization: (data['capacityUtilization'] as num).toDouble(),
+      efficiencyIssues: List<String>.from(data['efficiencyIssues'] ?? []),
+      optimizationSuggestions: List<String>.from(
+        data['optimizationSuggestions'] ?? [],
+      ),
+    );
+  }
+
   String _performanceRatingToString(PerformanceRating rating) {
     switch (rating) {
       case PerformanceRating.excellent:

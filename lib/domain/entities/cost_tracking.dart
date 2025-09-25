@@ -52,6 +52,24 @@ enum CostCategory {
 
   /// Recurring monthly costs
   recurring,
+
+  /// Direct labor costs - wages for kitchen staff directly involved in food production
+  directLabor,
+
+  /// Indirect labor costs - management, administrative, and support staff
+  indirectLabor,
+
+  /// Food ingredients and raw materials for cooking
+  foodIngredients,
+
+  /// Packaging materials for takeout, delivery, and storage
+  packaging,
+
+  /// Beverages including alcoholic and non-alcoholic drinks
+  beverages,
+
+  /// Utilities like electricity, gas, water, and internet
+  utilities,
 }
 
 /// Profitability metrics

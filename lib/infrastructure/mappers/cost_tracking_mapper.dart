@@ -327,6 +327,18 @@ class CostTrackingMapper {
         return 'one_time';
       case CostCategory.recurring:
         return 'recurring';
+      case CostCategory.directLabor:
+        return 'direct_labor';
+      case CostCategory.indirectLabor:
+        return 'indirect_labor';
+      case CostCategory.foodIngredients:
+        return 'food_ingredients';
+      case CostCategory.packaging:
+        return 'packaging';
+      case CostCategory.beverages:
+        return 'beverages';
+      case CostCategory.utilities:
+        return 'utilities';
     }
   }
 
@@ -342,6 +354,18 @@ class CostTrackingMapper {
         return CostCategory.oneTime;
       case 'recurring':
         return CostCategory.recurring;
+      case 'direct_labor':
+        return CostCategory.directLabor;
+      case 'indirect_labor':
+        return CostCategory.indirectLabor;
+      case 'food_ingredients':
+        return CostCategory.foodIngredients;
+      case 'packaging':
+        return CostCategory.packaging;
+      case 'beverages':
+        return CostCategory.beverages;
+      case 'utilities':
+        return CostCategory.utilities;
       default:
         throw ArgumentError('Invalid cost category: $category');
     }

@@ -1000,12 +1000,101 @@ class FirebaseCostTrackingRepository implements CostTrackingRepository {
     Time periodEnd,
   ) async {
     try {
-      // Simplified implementation - would need actual budget vs actual cost calculation
-      final variance = <UserId, double>{};
-      variance[costCenterId] = 0.0; // Placeholder
+      developer.log(
+        'Calculating budget variance for cost center: ${costCenterId.value}',
+        name: 'FirebaseCostTrackingRepository',
+      );
 
-      return Right(variance);
-    } catch (e) {
+      // Get cost center to retrieve budget information
+      final costCenterResult = await getCostCenterById(costCenterId);
+
+      return costCenterResult.fold((failure) => Left(failure), (
+        costCenter,
+      ) async {
+        // Get actual costs for the period
+        final actualCostsResult = await _getActualCostsForCostCenter(
+          costCenterId,
+          periodStart,
+          periodEnd,
+        );
+
+        return actualCostsResult.fold((failure) => Left(failure), (
+          actualCosts,
+        ) async {
+          final variance = <UserId, double>{};
+
+          // Calculate budget allocation for the period
+          final budgetForPeriod = _calculateBudgetAllocationForPeriod(
+            costCenter.budgetLimit,
+            costCenter.budgetPeriodStart,
+            costCenter.budgetPeriodEnd,
+            periodStart,
+            periodEnd,
+          );
+
+          final totalActualCost = actualCosts.fold(
+            0.0,
+            (sum, cost) => sum + cost.amount.amount,
+          );
+
+          // Calculate variance as percentage: (Actual - Budget) / Budget * 100
+          final budgetVariancePercent = budgetForPeriod > 0
+              ? ((totalActualCost - budgetForPeriod) / budgetForPeriod) * 100
+              : totalActualCost > 0
+              ? 100.0
+              : 0.0; // If no budget but have costs, 100% over
+
+          variance[costCenterId] = budgetVariancePercent;
+
+          // Log detailed variance information
+          developer.log(
+            'Budget variance calculated - Budget: \$${budgetForPeriod.toStringAsFixed(2)}, '
+            'Actual: \$${totalActualCost.toStringAsFixed(2)}, '
+            'Variance: ${budgetVariancePercent.toStringAsFixed(2)}%',
+            name: 'FirebaseCostTrackingRepository',
+          );
+
+          // Get child cost centers if this is a parent
+          final childCentersResult = await _getChildCostCenters(costCenterId);
+
+          return childCentersResult.fold(
+            (failure) => Right(
+              variance,
+            ), // Return parent variance even if can't get children
+            (childCenters) async {
+              // Calculate variance for each child cost center
+              for (final childCenter in childCenters) {
+                final childVarianceResult = await calculateBudgetVariance(
+                  childCenter.id,
+                  periodStart,
+                  periodEnd,
+                );
+
+                childVarianceResult.fold(
+                  (failure) {
+                    developer.log(
+                      'Failed to calculate variance for child center: ${childCenter.id.value}',
+                      name: 'FirebaseCostTrackingRepository',
+                    );
+                  },
+                  (childVariances) {
+                    variance.addAll(childVariances);
+                  },
+                );
+              }
+
+              return Right(variance);
+            },
+          );
+        });
+      });
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to calculate budget variance: $e',
+        name: 'FirebaseCostTrackingRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Left(ServerFailure('Failed to calculate budget variance: $e'));
     }
   }
@@ -1016,16 +1105,363 @@ class FirebaseCostTrackingRepository implements CostTrackingRepository {
     Time endDate,
   ) async {
     try {
-      // Simplified implementation - would need complex efficiency calculations
-      final metrics = <String, double>{
-        'cost_per_order': 0.0,
-        'labor_efficiency': 0.0,
-        'ingredient_waste_percentage': 0.0,
-      };
+      developer.log(
+        'Calculating cost efficiency metrics for period: ${startDate.millisecondsSinceEpoch} to ${endDate.millisecondsSinceEpoch}',
+        name: 'FirebaseCostTrackingRepository',
+      );
 
-      return Right(metrics);
-    } catch (e) {
+      // Get all costs for the period
+      final costsResult = await getCostsByDateRange(startDate, endDate);
+
+      return costsResult.fold((failure) => Left(failure), (costs) async {
+        final metrics = <String, double>{};
+
+        // 1. Calculate Cost Per Order
+        final orderCosts = costs
+            .where(
+              (cost) =>
+                  cost.category == CostCategory.directLabor ||
+                  cost.category == CostCategory.foodIngredients ||
+                  cost.category == CostCategory.packaging,
+            )
+            .toList();
+
+        final totalOrderCosts = orderCosts.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        // Estimate order count (would need integration with order system)
+        final estimatedOrderCount = await _estimateOrderCount(
+          startDate,
+          endDate,
+        );
+        final costPerOrder = estimatedOrderCount > 0
+            ? totalOrderCosts / estimatedOrderCount
+            : 0.0;
+
+        metrics['cost_per_order'] = costPerOrder;
+
+        // 2. Calculate Labor Efficiency
+        final laborCosts = costs
+            .where(
+              (cost) =>
+                  cost.category == CostCategory.directLabor ||
+                  cost.category == CostCategory.indirectLabor,
+            )
+            .toList();
+
+        final totalLaborCosts = laborCosts.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        final revenueEstimate = await _estimateRevenue(startDate, endDate);
+        final laborEfficiency = revenueEstimate > 0
+            ? (totalLaborCosts / revenueEstimate) * 100
+            : 0.0;
+
+        metrics['labor_efficiency_percentage'] = laborEfficiency;
+
+        // 3. Calculate Ingredient Waste Percentage
+        final ingredientCosts = costs
+            .where((cost) => cost.category == CostCategory.foodIngredients)
+            .toList();
+
+        final wasteCosts = costs
+            .where(
+              (cost) =>
+                  cost.description.toLowerCase().contains('waste') ||
+                  cost.description.toLowerCase().contains('spoilage') ||
+                  cost.description.toLowerCase().contains('expired'),
+            )
+            .toList();
+
+        final totalIngredientCosts = ingredientCosts.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        final totalWasteCosts = wasteCosts.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        final wastePercentage = totalIngredientCosts > 0
+            ? (totalWasteCosts / totalIngredientCosts) * 100
+            : 0.0;
+
+        metrics['ingredient_waste_percentage'] = wastePercentage;
+
+        // 4. Calculate Food Cost Percentage
+        final foodCosts = costs
+            .where(
+              (cost) =>
+                  cost.category == CostCategory.foodIngredients ||
+                  cost.category == CostCategory.beverages,
+            )
+            .toList();
+
+        final totalFoodCosts = foodCosts.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        final foodCostPercentage = revenueEstimate > 0
+            ? (totalFoodCosts / revenueEstimate) * 100
+            : 0.0;
+
+        metrics['food_cost_percentage'] = foodCostPercentage;
+
+        // 5. Calculate Utility Efficiency
+        final utilityCosts = costs
+            .where((cost) => cost.category == CostCategory.utilities)
+            .toList();
+
+        final totalUtilityCosts = utilityCosts.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        final utilityEfficiency = revenueEstimate > 0
+            ? (totalUtilityCosts / revenueEstimate) * 100
+            : 0.0;
+
+        metrics['utility_efficiency_percentage'] = utilityEfficiency;
+
+        // 6. Calculate Average Transaction Value Impact
+        final avgTransactionValue = estimatedOrderCount > 0
+            ? revenueEstimate / estimatedOrderCount
+            : 0.0;
+
+        metrics['average_transaction_value'] = avgTransactionValue;
+
+        // 7. Calculate Cost Variance Trend
+        final costTrend = await _calculateCostTrend(costs, startDate, endDate);
+        metrics['cost_trend_percentage'] = costTrend;
+
+        // 8. Calculate Profitability Margin
+        final totalCostAmount = costs.fold(
+          0.0,
+          (sum, cost) => sum + cost.amount.amount,
+        );
+
+        final profitabilityMargin = revenueEstimate > 0
+            ? ((revenueEstimate - totalCostAmount) / revenueEstimate) * 100
+            : 0.0;
+
+        metrics['profitability_margin_percentage'] = profitabilityMargin;
+
+        developer.log(
+          'Cost efficiency metrics calculated: ${metrics.length} metrics',
+          name: 'FirebaseCostTrackingRepository',
+        );
+
+        return Right(metrics);
+      });
+    } catch (e, stackTrace) {
+      developer.log(
+        'Failed to calculate cost efficiency metrics: $e',
+        name: 'FirebaseCostTrackingRepository',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return Left(ServerFailure('Failed to get cost efficiency metrics: $e'));
     }
+  }
+
+  // ======================== Enhanced Helper Methods ========================
+
+  Future<Either<Failure, List<Cost>>> _getActualCostsForCostCenter(
+    UserId costCenterId,
+    Time periodStart,
+    Time periodEnd,
+  ) async {
+    try {
+      final snapshot = await _firestore
+          .collection('cost_tracking')
+          .doc('costs')
+          .collection('entries')
+          .where('costCenterId', isEqualTo: costCenterId.value)
+          .where(
+            'incurredDate',
+            isGreaterThanOrEqualTo: periodStart.millisecondsSinceEpoch,
+          )
+          .where(
+            'incurredDate',
+            isLessThanOrEqualTo: periodEnd.millisecondsSinceEpoch,
+          )
+          .get();
+
+      final costs = snapshot.docs
+          .map((doc) => _mapper.costFromFirestore(doc.data(), doc.id))
+          .toList();
+
+      return Right(costs);
+    } catch (e) {
+      return Left(
+        ServerFailure('Failed to get actual costs for cost center: $e'),
+      );
+    }
+  }
+
+  double _calculateBudgetAllocationForPeriod(
+    Money? budgetLimit,
+    Time? budgetPeriodStart,
+    Time? budgetPeriodEnd,
+    Time periodStart,
+    Time periodEnd,
+  ) {
+    if (budgetLimit == null ||
+        budgetPeriodStart == null ||
+        budgetPeriodEnd == null) {
+      return 0.0;
+    }
+
+    final budgetPeriodDuration =
+        budgetPeriodEnd.millisecondsSinceEpoch -
+        budgetPeriodStart.millisecondsSinceEpoch;
+    final requestedPeriodDuration =
+        periodEnd.millisecondsSinceEpoch - periodStart.millisecondsSinceEpoch;
+
+    if (budgetPeriodDuration <= 0) return budgetLimit.amount;
+
+    // Calculate proportional budget allocation
+    final allocationRatio = requestedPeriodDuration / budgetPeriodDuration;
+    return budgetLimit.amount * allocationRatio;
+  }
+
+  Future<Either<Failure, List<CostCenter>>> _getChildCostCenters(
+    UserId parentId,
+  ) async {
+    try {
+      final snapshot = await _firestore
+          .collection('cost_tracking')
+          .doc('cost_centers')
+          .collection('centers')
+          .where('parentCenterId', isEqualTo: parentId.value)
+          .where('isActive', isEqualTo: true)
+          .get();
+
+      final childCenters = snapshot.docs
+          .map((doc) => _mapper.costCenterFromFirestore(doc.data(), doc.id))
+          .toList();
+
+      return Right(childCenters);
+    } catch (e) {
+      return Left(ServerFailure('Failed to get child cost centers: $e'));
+    }
+  }
+
+  Future<int> _estimateOrderCount(Time startDate, Time endDate) async {
+    try {
+      // This would integrate with the order system in a real implementation
+      // For now, estimate based on cost patterns and typical restaurant metrics
+      final orderRelatedCosts = await _firestore
+          .collection('cost_tracking')
+          .doc('costs')
+          .collection('entries')
+          .where('category', isEqualTo: CostCategory.foodIngredients.name)
+          .where(
+            'incurredDate',
+            isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch,
+          )
+          .where(
+            'incurredDate',
+            isLessThanOrEqualTo: endDate.millisecondsSinceEpoch,
+          )
+          .get();
+
+      // Estimate: assume each $15 in food costs represents one order (industry average)
+      final totalFoodCosts = orderRelatedCosts.docs.fold(
+        0.0,
+        (sum, doc) => sum + ((doc.data()['amount'] as num?)?.toDouble() ?? 0.0),
+      );
+
+      return (totalFoodCosts / 15.0).round();
+    } catch (e) {
+      developer.log('Failed to estimate order count: $e');
+      return 0;
+    }
+  }
+
+  Future<double> _estimateRevenue(Time startDate, Time endDate) async {
+    try {
+      // Estimate revenue based on cost structure (typical restaurant markup is 3-4x food cost)
+      final foodCosts = await _firestore
+          .collection('cost_tracking')
+          .doc('costs')
+          .collection('entries')
+          .where(
+            'category',
+            whereIn: [
+              CostCategory.foodIngredients.name,
+              CostCategory.beverages.name,
+            ],
+          )
+          .where(
+            'incurredDate',
+            isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch,
+          )
+          .where(
+            'incurredDate',
+            isLessThanOrEqualTo: endDate.millisecondsSinceEpoch,
+          )
+          .get();
+
+      final totalFoodCosts = foodCosts.docs.fold(
+        0.0,
+        (sum, doc) => sum + ((doc.data()['amount'] as num?)?.toDouble() ?? 0.0),
+      );
+
+      // Estimate revenue as 3.5x food costs (industry average markup)
+      return totalFoodCosts * 3.5;
+    } catch (e) {
+      developer.log('Failed to estimate revenue: $e');
+      return 0.0;
+    }
+  }
+
+  Future<double> _calculateCostTrend(
+    List<Cost> costs,
+    Time startDate,
+    Time endDate,
+  ) async {
+    if (costs.length < 2) return 0.0;
+
+    // Sort costs by date
+    final sortedCosts = List<Cost>.from(costs)
+      ..sort(
+        (a, b) => a.incurredDate.millisecondsSinceEpoch.compareTo(
+          b.incurredDate.millisecondsSinceEpoch,
+        ),
+      );
+
+    // Calculate trend using simple linear regression
+    final totalPeriod =
+        endDate.millisecondsSinceEpoch - startDate.millisecondsSinceEpoch;
+    final midPoint = totalPeriod / 2;
+
+    final firstHalfCosts = sortedCosts
+        .where(
+          (cost) =>
+              cost.incurredDate.millisecondsSinceEpoch -
+                  startDate.millisecondsSinceEpoch <=
+              midPoint,
+        )
+        .fold(0.0, (sum, cost) => sum + cost.amount.amount);
+
+    final secondHalfCosts = sortedCosts
+        .where(
+          (cost) =>
+              cost.incurredDate.millisecondsSinceEpoch -
+                  startDate.millisecondsSinceEpoch >
+              midPoint,
+        )
+        .fold(0.0, (sum, cost) => sum + cost.amount.amount);
+
+    if (firstHalfCosts == 0) return secondHalfCosts > 0 ? 100.0 : 0.0;
+
+    return ((secondHalfCosts - firstHalfCosts) / firstHalfCosts) * 100;
   }
 }
