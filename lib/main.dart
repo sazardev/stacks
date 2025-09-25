@@ -57,7 +57,7 @@ class _AppShellState extends State<AppShell> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const KitchenDashboardPage(),
+    const KitchenDashboardSimple(),
     const StationManagementPage(),
     const AnalyticsPage(),
     const SettingsPage(),

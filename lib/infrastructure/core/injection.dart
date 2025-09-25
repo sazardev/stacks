@@ -19,11 +19,11 @@ import '../mappers/cost_tracking_mapper.dart';
 import '../repositories/firebase_user_repository.dart';
 import '../repositories/firebase_order_repository.dart';
 import '../repositories/firebase_station_repository.dart';
-import '../repositories/recipe_repository_impl.dart';
-import '../repositories/inventory_repository_impl.dart';
-import '../repositories/table_repository_impl.dart';
+import '../repositories/firebase_recipe_repository.dart';
+import '../repositories/firebase_inventory_repository.dart';
+import '../repositories/firebase_table_repository.dart';
+import '../repositories/firebase_kitchen_timer_repository.dart';
 import '../repositories/analytics_repository_impl.dart';
-import '../repositories/kitchen_timer_repository_impl.dart';
 import '../repositories/food_safety_repository_impl.dart';
 import '../repositories/cost_tracking_repository_impl.dart';
 
@@ -72,15 +72,15 @@ Future<void> setupDependencyInjection() async {
   );
 
   getIt.registerLazySingleton<RecipeRepository>(
-    () => RecipeRepositoryImpl(recipeMapper: getIt<RecipeMapper>()),
+    () => FirebaseRecipeRepository(getIt<RecipeMapper>()),
   );
 
   getIt.registerLazySingleton<InventoryRepository>(
-    () => InventoryRepositoryImpl(inventoryMapper: getIt<InventoryMapper>()),
+    () => FirebaseInventoryRepository(getIt<InventoryMapper>()),
   );
 
   getIt.registerLazySingleton<TableRepository>(
-    () => TableRepositoryImpl(tableMapper: getIt<TableMapper>()),
+    () => FirebaseTableRepository(getIt<TableMapper>()),
   );
 
   getIt.registerLazySingleton<AnalyticsRepository>(
@@ -88,7 +88,7 @@ Future<void> setupDependencyInjection() async {
   );
 
   getIt.registerLazySingleton<KitchenTimerRepository>(
-    () => KitchenTimerRepositoryImpl(timerMapper: getIt<KitchenTimerMapper>()),
+    () => FirebaseKitchenTimerRepository(getIt<KitchenTimerMapper>()),
   );
 
   getIt.registerLazySingleton<FoodSafetyRepository>(

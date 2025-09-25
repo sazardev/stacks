@@ -20,7 +20,7 @@ export 'blocs/station/station_bloc.dart';
 // Pages
 export 'pages/auth/login_page.dart';
 export 'pages/auth/register_page.dart';
-export 'pages/kitchen/kitchen_dashboard_bloc.dart';
+export 'pages/kitchen/kitchen_dashboard_simple.dart';
 export 'pages/stations/stations_page.dart';
 export 'pages/stations/station_detail_page.dart';
 // TODO: Add when implemented
