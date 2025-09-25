@@ -25,7 +25,7 @@ import '../repositories/firebase_table_repository.dart';
 import '../repositories/firebase_kitchen_timer_repository.dart';
 import '../repositories/analytics_repository_impl.dart';
 import '../repositories/food_safety_repository_impl.dart';
-import '../repositories/cost_tracking_repository_impl.dart';
+import '../repositories/firebase_cost_tracking_repository.dart';
 
 // Import domain repository interfaces
 import '../../domain/repositories/user_repository.dart';
@@ -96,7 +96,7 @@ Future<void> setupDependencyInjection() async {
   );
 
   getIt.registerLazySingleton<CostTrackingRepository>(
-    () => CostTrackingRepositoryImpl(),
+    () => FirebaseCostTrackingRepository(getIt<CostTrackingMapper>()),
   );
 
   // Setup presentation layer dependencies (BLoCs and use cases)
