@@ -5,7 +5,6 @@ import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../domain/entities/food_safety.dart';
 import '../../../domain/repositories/food_safety_repository.dart';
-import '../../../domain/repositories/user_repository.dart';
 import '../../../domain/failures/failures.dart';
 import '../../../domain/value_objects/user_id.dart';
 import '../../../domain/value_objects/time.dart';
@@ -14,13 +13,10 @@ import '../../../domain/value_objects/time.dart';
 @injectable
 class ManageFoodSafetyComplianceProgramUseCase {
   final FoodSafetyRepository _foodSafetyRepository;
-  final UserRepository _userRepository;
 
   const ManageFoodSafetyComplianceProgramUseCase({
     required FoodSafetyRepository foodSafetyRepository,
-    required UserRepository userRepository,
-  }) : _foodSafetyRepository = foodSafetyRepository,
-       _userRepository = userRepository;
+  }) : _foodSafetyRepository = foodSafetyRepository;
 
   /// Execute comprehensive food safety compliance assessment and management
   Future<Either<Failure, Map<String, dynamic>>> execute({
@@ -44,7 +40,8 @@ class ManageFoodSafetyComplianceProgramUseCase {
       );
 
       // 3. Get control points
-      final controlPoints = await _foodSafetyRepository.getActiveControlPoints();
+      final controlPoints = await _foodSafetyRepository
+          .getActiveControlPoints();
 
       // 4. Get audits for the period
       final audits = await _foodSafetyRepository.getAuditsByDateRange(
@@ -68,17 +65,11 @@ class ManageFoodSafetyComplianceProgramUseCase {
       );
 
       // 7. Generate risk assessment
-      final riskAssessment = _generateRiskAssessment(
-        violations,
-        audits,
-      );
+      final riskAssessment = _generateRiskAssessment(violations, audits);
 
       // 8. Create corrective action plan if requested
       final correctiveActions = generateCorrectiveActions
-          ? _generateCorrectiveActionPlan(
-              violations,
-              controlPoints,
-            )
+          ? _generateCorrectiveActionPlan(violations, controlPoints)
           : <String>[];
 
       // 9. Generate staff compliance tracking
@@ -117,22 +108,32 @@ class ManageFoodSafetyComplianceProgramUseCase {
     List<FoodSafetyAudit> audits,
   ) {
     final totalLogs = temperatureLogs.length;
-    final compliantLogs = temperatureLogs.where((log) => log.isWithinSafeRange).length;
-    final temperatureCompliance = totalLogs > 0 ? compliantLogs / totalLogs : 0.0;
-
-    final resolvedViolations = violations.where((v) => v.isResolved).length;
-    final violationResolution = violations.isNotEmpty ? resolvedViolations / violations.length : 1.0;
-
-    final passedAudits = audits.where((audit) => audit.passed).length;
-    final auditCompliance = audits.isNotEmpty ? passedAudits / audits.length : 1.0;
-
-    final averageAuditScore = audits.isNotEmpty 
-        ? audits.fold<double>(0.0, (sum, audit) => sum + audit.score) / audits.length
+    final compliantLogs = temperatureLogs
+        .where((log) => log.isWithinSafeRange)
+        .length;
+    final temperatureCompliance = totalLogs > 0
+        ? compliantLogs / totalLogs
         : 0.0;
 
-    final overallScore = (temperatureCompliance * 0.4) + 
-                        (violationResolution * 0.3) + 
-                        (auditCompliance * 0.3);
+    final resolvedViolations = violations.where((v) => v.isResolved).length;
+    final violationResolution = violations.isNotEmpty
+        ? resolvedViolations / violations.length
+        : 1.0;
+
+    final passedAudits = audits.where((audit) => audit.passed).length;
+    final auditCompliance = audits.isNotEmpty
+        ? passedAudits / audits.length
+        : 1.0;
+
+    final averageAuditScore = audits.isNotEmpty
+        ? audits.fold<double>(0.0, (sum, audit) => sum + audit.score) /
+              audits.length
+        : 0.0;
+
+    final overallScore =
+        (temperatureCompliance * 0.4) +
+        (violationResolution * 0.3) +
+        (auditCompliance * 0.3);
 
     return {
       'temperature_compliance': temperatureCompliance,
@@ -159,15 +160,19 @@ class ManageFoodSafetyComplianceProgramUseCase {
     final criticalPoints = <Map<String, dynamic>>[];
 
     // Group violations by location and type
-    final violationsByLocation = <TemperatureLocation, List<FoodSafetyViolation>>{};
+    final violationsByLocation =
+        <TemperatureLocation, List<FoodSafetyViolation>>{};
     for (final violation in violations) {
       if (violation.location != null) {
-        violationsByLocation.putIfAbsent(violation.location!, () => []).add(violation);
+        violationsByLocation
+            .putIfAbsent(violation.location!, () => [])
+            .add(violation);
       }
     }
 
     // Group temperature violations by location
-    final tempViolationsByLocation = <TemperatureLocation, List<TemperatureLog>>{};
+    final tempViolationsByLocation =
+        <TemperatureLocation, List<TemperatureLog>>{};
     for (final log in temperatureLogs) {
       if (!log.isWithinSafeRange) {
         tempViolationsByLocation.putIfAbsent(log.location, () => []).add(log);
@@ -178,8 +183,9 @@ class ManageFoodSafetyComplianceProgramUseCase {
     for (final location in TemperatureLocation.values) {
       final locationViolations = violationsByLocation[location] ?? [];
       final locationTempViolations = tempViolationsByLocation[location] ?? [];
-      
-      if (locationViolations.length >= 3 || locationTempViolations.length >= 5) {
+
+      if (locationViolations.length >= 3 ||
+          locationTempViolations.length >= 5) {
         criticalPoints.add({
           'location': location.toString(),
           'violation_count': locationViolations.length,
@@ -198,17 +204,23 @@ class ManageFoodSafetyComplianceProgramUseCase {
     List<FoodSafetyViolation> violations,
     List<FoodSafetyAudit> audits,
   ) {
-    final criticalViolations = violations.where((v) => v.severity == ViolationSeverity.critical).length;
-    final emergencyViolations = violations.where((v) => v.severity == ViolationSeverity.emergency).length;
+    final criticalViolations = violations
+        .where((v) => v.severity == ViolationSeverity.critical)
+        .length;
+    final emergencyViolations = violations
+        .where((v) => v.severity == ViolationSeverity.emergency)
+        .length;
     final unresolvedViolations = violations.where((v) => !v.isResolved).length;
-    
+
     final failedAudits = audits.where((audit) => !audit.passed).length;
     final lowScoreAudits = audits.where((audit) => audit.score < 70.0).length;
 
     var riskLevel = 'low';
     if (emergencyViolations > 0 || criticalViolations > 5 || failedAudits > 2) {
       riskLevel = 'high';
-    } else if (criticalViolations > 2 || unresolvedViolations > 10 || lowScoreAudits > 1) {
+    } else if (criticalViolations > 2 ||
+        unresolvedViolations > 10 ||
+        lowScoreAudits > 1) {
       riskLevel = 'medium';
     }
 
@@ -250,7 +262,9 @@ class ManageFoodSafetyComplianceProgramUseCase {
             actions.add('Increase hygiene compliance monitoring');
             break;
           case ViolationType.crossContamination:
-            actions.add('Review and reinforce cross-contamination prevention procedures');
+            actions.add(
+              'Review and reinforce cross-contamination prevention procedures',
+            );
             actions.add('Implement color-coded cutting board system');
             break;
           case ViolationType.equipmentFailure:
@@ -258,7 +272,9 @@ class ManageFoodSafetyComplianceProgramUseCase {
             actions.add('Create equipment backup plan');
             break;
           default:
-            actions.add('Address ${type.toString()} violations through targeted training');
+            actions.add(
+              'Address ${type.toString()} violations through targeted training',
+            );
         }
       }
     });
@@ -294,11 +310,11 @@ class ManageFoodSafetyComplianceProgramUseCase {
         };
       }
 
-      staffPerformance[staffId]!['total_logs'] = 
+      staffPerformance[staffId]!['total_logs'] =
           (staffPerformance[staffId]!['total_logs'] as int) + 1;
-      
+
       if (log.isWithinSafeRange) {
-        staffPerformance[staffId]!['compliant_logs'] = 
+        staffPerformance[staffId]!['compliant_logs'] =
             (staffPerformance[staffId]!['compliant_logs'] as int) + 1;
       }
     }
@@ -318,9 +334,13 @@ class ManageFoodSafetyComplianceProgramUseCase {
   }
 
   String _calculateLocationSeverity(List<FoodSafetyViolation> violations) {
-    final criticalCount = violations.where((v) => v.severity == ViolationSeverity.critical).length;
-    final emergencyCount = violations.where((v) => v.severity == ViolationSeverity.emergency).length;
-    
+    final criticalCount = violations
+        .where((v) => v.severity == ViolationSeverity.critical)
+        .length;
+    final emergencyCount = violations
+        .where((v) => v.severity == ViolationSeverity.emergency)
+        .length;
+
     if (emergencyCount > 0) return 'emergency';
     if (criticalCount > 2) return 'critical';
     if (violations.length > 5) return 'high';
@@ -332,11 +352,12 @@ class ManageFoodSafetyComplianceProgramUseCase {
     List<FoodSafetyAudit> audits,
   ) {
     final factors = <String>[];
-    
+
     // Check for recurring violation types
     final violationCounts = <ViolationType, int>{};
     for (final violation in violations) {
-      violationCounts[violation.type] = (violationCounts[violation.type] ?? 0) + 1;
+      violationCounts[violation.type] =
+          (violationCounts[violation.type] ?? 0) + 1;
     }
 
     violationCounts.forEach((type, count) {
@@ -384,21 +405,25 @@ class ManageFoodSafetyComplianceProgramUseCase {
     }
   }
 
-  List<String> _getTopPerformers(Map<String, Map<String, dynamic>> staffPerformance) {
+  List<String> _getTopPerformers(
+    Map<String, Map<String, dynamic>> staffPerformance,
+  ) {
     final performers = staffPerformance.entries
         .where((entry) => (entry.value['compliance_rate'] as double) >= 0.95)
         .map((entry) => entry.key)
         .toList();
-    
+
     return performers;
   }
 
-  List<String> _getStaffNeedingTraining(Map<String, Map<String, dynamic>> staffPerformance) {
+  List<String> _getStaffNeedingTraining(
+    Map<String, Map<String, dynamic>> staffPerformance,
+  ) {
     final needsTraining = staffPerformance.entries
         .where((entry) => (entry.value['compliance_rate'] as double) < 0.8)
         .map((entry) => entry.key)
         .toList();
-    
+
     return needsTraining;
   }
 }
@@ -421,11 +446,16 @@ class TemperatureMonitoringUseCase {
     try {
       // Get temperature logs for the period
       final temperatureLogs = await _foodSafetyRepository
-          .getTemperatureLogsByDateRange(monitoringPeriodStart, monitoringPeriodEnd);
+          .getTemperatureLogsByDateRange(
+            monitoringPeriodStart,
+            monitoringPeriodEnd,
+          );
 
       // Filter by specific locations if provided
       final filteredLogs = specificLocations != null
-          ? temperatureLogs.where((log) => specificLocations.contains(log.location)).toList()
+          ? temperatureLogs
+                .where((log) => specificLocations.contains(log.location))
+                .toList()
           : temperatureLogs;
 
       // Analyze temperature trends
@@ -448,7 +478,9 @@ class TemperatureMonitoringUseCase {
 
       return Right(report);
     } catch (e) {
-      return Left(ServerFailure('Failed to execute temperature monitoring: $e'));
+      return Left(
+        ServerFailure('Failed to execute temperature monitoring: $e'),
+      );
     }
   }
 
@@ -464,10 +496,11 @@ class TemperatureMonitoringUseCase {
     }
 
     final temperatures = logs.map((log) => log.temperature).toList();
-    final averageTemp = temperatures.reduce((a, b) => a + b) / temperatures.length;
+    final averageTemp =
+        temperatures.reduce((a, b) => a + b) / temperatures.length;
     final minTemp = temperatures.reduce((a, b) => a < b ? a : b);
     final maxTemp = temperatures.reduce((a, b) => a > b ? a : b);
-    
+
     final compliantLogs = logs.where((log) => log.isWithinSafeRange).length;
     final complianceRate = compliantLogs / logs.length;
 
@@ -481,7 +514,9 @@ class TemperatureMonitoringUseCase {
     };
   }
 
-  Future<List<Map<String, dynamic>>> _identifyTemperatureAlerts(List<TemperatureLog> logs) async {
+  Future<List<Map<String, dynamic>>> _identifyTemperatureAlerts(
+    List<TemperatureLog> logs,
+  ) async {
     final alerts = <Map<String, dynamic>>[];
 
     for (final log in logs) {
@@ -491,7 +526,9 @@ class TemperatureMonitoringUseCase {
           'location': log.location.toString(),
           'temperature': log.temperature,
           'recorded_at': log.recordedAt.millisecondsSinceEpoch,
-          'alert_type': !log.isWithinSafeRange ? 'out_of_range' : 'requires_action',
+          'alert_type': !log.isWithinSafeRange
+              ? 'out_of_range'
+              : 'requires_action',
           'severity': _calculateTemperatureAlertSeverity(log),
         });
       }
@@ -507,31 +544,43 @@ class TemperatureMonitoringUseCase {
   Map<String, dynamic> _generateComplianceSummary(List<TemperatureLog> logs) {
     final totalLogs = logs.length;
     final compliantLogs = logs.where((log) => log.isWithinSafeRange).length;
-    final logsRequiringAction = logs.where((log) => log.requiresCorrectiveAction).length;
+    final logsRequiringAction = logs
+        .where((log) => log.requiresCorrectiveAction)
+        .length;
 
     return {
       'total_logs': totalLogs,
       'compliant_logs': compliantLogs,
       'non_compliant_logs': totalLogs - compliantLogs,
       'logs_requiring_action': logsRequiringAction,
-      'compliance_percentage': totalLogs > 0 ? (compliantLogs / totalLogs * 100) : 0.0,
+      'compliance_percentage': totalLogs > 0
+          ? (compliantLogs / totalLogs * 100)
+          : 0.0,
     };
   }
 
   String _determineTrend(List<TemperatureLog> logs) {
     if (logs.length < 3) return 'insufficient_data';
-    
-    final sortedLogs = logs..sort((a, b) => a.recordedAt.millisecondsSinceEpoch
-        .compareTo(b.recordedAt.millisecondsSinceEpoch));
-    
+
+    final sortedLogs = logs
+      ..sort(
+        (a, b) => a.recordedAt.millisecondsSinceEpoch.compareTo(
+          b.recordedAt.millisecondsSinceEpoch,
+        ),
+      );
+
     final firstHalf = sortedLogs.take(logs.length ~/ 2);
     final secondHalf = sortedLogs.skip(logs.length ~/ 2);
-    
-    final firstAvg = firstHalf.fold<double>(0.0, (sum, log) => sum + log.temperature) / firstHalf.length;
-    final secondAvg = secondHalf.fold<double>(0.0, (sum, log) => sum + log.temperature) / secondHalf.length;
-    
+
+    final firstAvg =
+        firstHalf.fold<double>(0.0, (sum, log) => sum + log.temperature) /
+        firstHalf.length;
+    final secondAvg =
+        secondHalf.fold<double>(0.0, (sum, log) => sum + log.temperature) /
+        secondHalf.length;
+
     final difference = secondAvg - firstAvg;
-    
+
     if (difference > 2.0) return 'increasing';
     if (difference < -2.0) return 'decreasing';
     return 'stable';
@@ -539,7 +588,7 @@ class TemperatureMonitoringUseCase {
 
   Map<String, int> _analyzeTemperatureDistribution(List<TemperatureLog> logs) {
     final distribution = <String, int>{};
-    
+
     for (final log in logs) {
       String range;
       if (log.temperature < 32) {
@@ -551,10 +600,10 @@ class TemperatureMonitoringUseCase {
       } else {
         range = 'safe_hot';
       }
-      
+
       distribution[range] = (distribution[range] ?? 0) + 1;
     }
-    
+
     return distribution;
   }
 

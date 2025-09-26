@@ -106,6 +106,9 @@ enum CCPType {
   /// Storage temperature monitoring
   storage,
 
+  /// Food preparation monitoring
+  preparation,
+
   /// Cooking temperature verification
   cooking,
 
@@ -115,11 +118,17 @@ enum CCPType {
   /// Cold holding temperature
   coldHolding,
 
+  /// General holding monitoring
+  holding,
+
   /// Cooling process monitoring
   cooling,
 
   /// Reheating temperature check
   reheating,
+
+  /// Food service monitoring
+  service,
 
   /// Sanitizer concentration
   sanitizerConcentration,
@@ -738,6 +747,12 @@ class FoodSafetyAudit {
 
   /// Whether audit passed
   bool get isPassed => _isPassed;
+
+  /// Whether audit passed (alternative getter for compatibility)
+  bool get passed => _isPassed;
+
+  /// Overall audit score (alternative getter for compatibility)
+  double get score => _overallScore;
 
   /// Audit notes
   String? get notes => _notes;

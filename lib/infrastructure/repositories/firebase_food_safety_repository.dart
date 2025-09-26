@@ -25,14 +25,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
   // ======================== Temperature Log Operations ========================
 
   @override
-  Future<TemperatureLog> createTemperatureLog(TemperatureLog temperatureLog) async {
+  Future<TemperatureLog> createTemperatureLog(
+    TemperatureLog temperatureLog,
+  ) async {
     try {
       developer.log(
         'Creating temperature log: ${temperatureLog.id.value}',
         name: 'FirebaseFoodSafetyRepository',
       );
 
-      final logData = _foodSafetyMapper.temperatureLogToFirestore(temperatureLog);
+      final logData = _foodSafetyMapper.temperatureLogToFirestore(
+        temperatureLog,
+      );
 
       await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -46,16 +50,23 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return temperatureLog;
     } catch (e) {
-      developer.log('Error creating temperature log: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error creating temperature log: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<TemperatureLog> updateTemperatureLog(TemperatureLog temperatureLog) async {
+  Future<TemperatureLog> updateTemperatureLog(
+    TemperatureLog temperatureLog,
+  ) async {
     try {
-      final logData = _foodSafetyMapper.temperatureLogToFirestore(temperatureLog);
-      
+      final logData = _foodSafetyMapper.temperatureLogToFirestore(
+        temperatureLog,
+      );
+
       await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('temperature_logs')
@@ -65,7 +76,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return temperatureLog;
     } catch (e) {
-      developer.log('Error updating temperature log: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error updating temperature log: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -86,13 +100,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return _foodSafetyMapper.temperatureLogFromFirestore(doc.data()!, doc.id);
     } catch (e) {
-      developer.log('Error getting temperature log by ID: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature log by ID: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<TemperatureLog>> getTemperatureLogsByLocation(TemperatureLocation location) async {
+  Future<List<TemperatureLog>> getTemperatureLogsByLocation(
+    TemperatureLocation location,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -103,16 +122,26 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.temperatureLogFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.temperatureLogFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting temperature logs by location: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature logs by location: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<TemperatureLog>> getTemperatureLogsByEquipment(String equipmentId) async {
+  Future<List<TemperatureLog>> getTemperatureLogsByEquipment(
+    String equipmentId,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -123,31 +152,56 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.temperatureLogFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.temperatureLogFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting temperature logs by equipment: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature logs by equipment: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<TemperatureLog>> getTemperatureLogsByDateRange(Time startDate, Time endDate) async {
+  Future<List<TemperatureLog>> getTemperatureLogsByDateRange(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('temperature_logs')
           .collection('logs')
-          .where('recordedAt', isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch)
-          .where('recordedAt', isLessThanOrEqualTo: endDate.millisecondsSinceEpoch)
+          .where(
+            'recordedAt',
+            isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch,
+          )
+          .where(
+            'recordedAt',
+            isLessThanOrEqualTo: endDate.millisecondsSinceEpoch,
+          )
           .orderBy('recordedAt', descending: true)
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.temperatureLogFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.temperatureLogFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting temperature logs by date range: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature logs by date range: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -164,10 +218,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.temperatureLogFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.temperatureLogFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting temperature logs requiring action: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature logs requiring action: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -184,16 +246,26 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.temperatureLogFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.temperatureLogFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting temperature logs outside safe range: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature logs outside safe range: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<TemperatureLog>> getTemperatureLogsByUser(UserId recordedBy) async {
+  Future<List<TemperatureLog>> getTemperatureLogsByUser(
+    UserId recordedBy,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -204,10 +276,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.temperatureLogFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.temperatureLogFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting temperature logs by user: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature logs by user: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -222,7 +302,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc(id.value)
           .delete();
     } catch (e) {
-      developer.log('Error deleting temperature log: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error deleting temperature log: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -230,7 +313,9 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
   // ======================== Food Safety Violation Operations ========================
 
   @override
-  Future<FoodSafetyViolation> createFoodSafetyViolation(FoodSafetyViolation violation) async {
+  Future<FoodSafetyViolation> createFoodSafetyViolation(
+    FoodSafetyViolation violation,
+  ) async {
     try {
       developer.log(
         'Creating food safety violation: ${violation.id.value}',
@@ -248,16 +333,21 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return violation;
     } catch (e) {
-      developer.log('Error creating food safety violation: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error creating food safety violation: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<FoodSafetyViolation> updateFoodSafetyViolation(FoodSafetyViolation violation) async {
+  Future<FoodSafetyViolation> updateFoodSafetyViolation(
+    FoodSafetyViolation violation,
+  ) async {
     try {
       final violationData = _foodSafetyMapper.violationToFirestore(violation);
-      
+
       await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('violations')
@@ -267,7 +357,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return violation;
     } catch (e) {
-      developer.log('Error updating food safety violation: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error updating food safety violation: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -288,13 +381,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return _foodSafetyMapper.violationFromFirestore(doc.data()!, doc.id);
     } catch (e) {
-      developer.log('Error getting food safety violation by ID: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting food safety violation by ID: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<FoodSafetyViolation>> getViolationsByType(ViolationType type) async {
+  Future<List<FoodSafetyViolation>> getViolationsByType(
+    ViolationType type,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -305,16 +403,24 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting violations by type: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violations by type: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<FoodSafetyViolation>> getViolationsBySeverity(ViolationSeverity severity) async {
+  Future<List<FoodSafetyViolation>> getViolationsBySeverity(
+    ViolationSeverity severity,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -325,16 +431,24 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting violations by severity: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violations by severity: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<FoodSafetyViolation>> getViolationsByLocation(TemperatureLocation location) async {
+  Future<List<FoodSafetyViolation>> getViolationsByLocation(
+    TemperatureLocation location,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -345,10 +459,16 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting violations by location: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violations by location: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -365,10 +485,16 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting unresolved violations: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting unresolved violations: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -382,21 +508,32 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc('violations')
           .collection('reports')
           .where('isResolved', isEqualTo: false)
-          .where('reportedAt', isLessThan: now - (24 * 60 * 60 * 1000)) // 24 hours ago
+          .where(
+            'reportedAt',
+            isLessThan: now - (24 * 60 * 60 * 1000),
+          ) // 24 hours ago
           .orderBy('reportedAt')
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting overdue violations: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting overdue violations: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<FoodSafetyViolation>> getViolationsAssignedToUser(UserId userId) async {
+  Future<List<FoodSafetyViolation>> getViolationsAssignedToUser(
+    UserId userId,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -407,31 +544,52 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting violations assigned to user: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violations assigned to user: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<FoodSafetyViolation>> getViolationsByDateRange(Time startDate, Time endDate) async {
+  Future<List<FoodSafetyViolation>> getViolationsByDateRange(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('violations')
           .collection('reports')
-          .where('reportedAt', isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch)
-          .where('reportedAt', isLessThanOrEqualTo: endDate.millisecondsSinceEpoch)
+          .where(
+            'reportedAt',
+            isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch,
+          )
+          .where(
+            'reportedAt',
+            isLessThanOrEqualTo: endDate.millisecondsSinceEpoch,
+          )
           .orderBy('reportedAt', descending: true)
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) =>
+                _foodSafetyMapper.violationFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting violations by date range: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violations by date range: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -455,8 +613,11 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         throw Exception('Violation not found');
       }
 
-      final violation = _foodSafetyMapper.violationFromFirestore(violationDoc.data()!, violationDoc.id);
-      
+      final violation = _foodSafetyMapper.violationFromFirestore(
+        violationDoc.data()!,
+        violationDoc.id,
+      );
+
       final resolvedViolation = FoodSafetyViolation(
         id: violation.id,
         type: violation.type,
@@ -478,7 +639,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
       await updateFoodSafetyViolation(resolvedViolation);
       return resolvedViolation;
     } catch (e) {
-      developer.log('Error resolving violation: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error resolving violation: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -493,7 +657,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc(id.value)
           .delete();
     } catch (e) {
-      developer.log('Error deleting food safety violation: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error deleting food safety violation: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -501,14 +668,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
   // ======================== HACCP Control Point Operations ========================
 
   @override
-  Future<HACCPControlPoint> createHACCPControlPoint(HACCPControlPoint controlPoint) async {
+  Future<HACCPControlPoint> createHACCPControlPoint(
+    HACCPControlPoint controlPoint,
+  ) async {
     try {
       developer.log(
         'Creating HACCP control point: ${controlPoint.id.value}',
         name: 'FirebaseFoodSafetyRepository',
       );
 
-      final controlPointData = _foodSafetyMapper.haccpControlPointToFirestore(controlPoint);
+      final controlPointData = _foodSafetyMapper.haccpControlPointToFirestore(
+        controlPoint,
+      );
 
       await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -519,16 +690,23 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return controlPoint;
     } catch (e) {
-      developer.log('Error creating HACCP control point: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error creating HACCP control point: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<HACCPControlPoint> updateHACCPControlPoint(HACCPControlPoint controlPoint) async {
+  Future<HACCPControlPoint> updateHACCPControlPoint(
+    HACCPControlPoint controlPoint,
+  ) async {
     try {
-      final controlPointData = _foodSafetyMapper.haccpControlPointToFirestore(controlPoint);
-      
+      final controlPointData = _foodSafetyMapper.haccpControlPointToFirestore(
+        controlPoint,
+      );
+
       await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('haccp_control_points')
@@ -538,7 +716,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return controlPoint;
     } catch (e) {
-      developer.log('Error updating HACCP control point: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error updating HACCP control point: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -557,9 +738,15 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         return null;
       }
 
-      return _foodSafetyMapper.haccpControlPointFromFirestore(doc.data()!, doc.id);
+      return _foodSafetyMapper.haccpControlPointFromFirestore(
+        doc.data()!,
+        doc.id,
+      );
     } catch (e) {
-      developer.log('Error getting HACCP control point by ID: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting HACCP control point by ID: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -576,10 +763,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.haccpControlPointFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.haccpControlPointFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting control points by type: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting control points by type: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -596,10 +791,18 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.haccpControlPointFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.haccpControlPointFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting active control points: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting active control points: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -613,21 +816,34 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc('haccp_control_points')
           .collection('points')
           .where('isActive', isEqualTo: true)
-          .where('lastMonitoredAt', isLessThan: now - (4 * 60 * 60 * 1000)) // 4 hours ago
+          .where(
+            'lastMonitoredAt',
+            isLessThan: now - (4 * 60 * 60 * 1000),
+          ) // 4 hours ago
           .orderBy('lastMonitoredAt')
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.haccpControlPointFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.haccpControlPointFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting control points requiring monitoring: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting control points requiring monitoring: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<HACCPControlPoint>> getControlPointsByResponsibleUser(UserId userId) async {
+  Future<List<HACCPControlPoint>> getControlPointsByResponsibleUser(
+    UserId userId,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -638,16 +854,27 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.haccpControlPointFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.haccpControlPointFromFirestore(
+              doc.data(),
+              doc.id,
+            ),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting control points by responsible user: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting control points by responsible user: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<HACCPControlPoint> updateControlPointMonitoring(UserId controlPointId, Time monitoredAt) async {
+  Future<HACCPControlPoint> updateControlPointMonitoring(
+    UserId controlPointId,
+    Time monitoredAt,
+  ) async {
     try {
       final controlPointDoc = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -665,19 +892,25 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc('haccp_control_points')
           .collection('points')
           .doc(controlPointId.value)
-          .update({
-        'lastMonitoredAt': monitoredAt.millisecondsSinceEpoch,
-      });
+          .update({'lastMonitoredAt': monitoredAt.millisecondsSinceEpoch});
 
-      return _foodSafetyMapper.haccpControlPointFromFirestore(controlPointDoc.data()!, controlPointDoc.id);
+      return _foodSafetyMapper.haccpControlPointFromFirestore(
+        controlPointDoc.data()!,
+        controlPointDoc.id,
+      );
     } catch (e) {
-      developer.log('Error updating control point monitoring: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error updating control point monitoring: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<HACCPControlPoint> deactivateControlPoint(UserId controlPointId) async {
+  Future<HACCPControlPoint> deactivateControlPoint(
+    UserId controlPointId,
+  ) async {
     try {
       final controlPointDoc = await _firestore
           .collection(FirebaseCollections.foodSafety)
@@ -697,9 +930,15 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc(controlPointId.value)
           .update({'isActive': false});
 
-      return _foodSafetyMapper.haccpControlPointFromFirestore(controlPointDoc.data()!, controlPointDoc.id);
+      return _foodSafetyMapper.haccpControlPointFromFirestore(
+        controlPointDoc.data()!,
+        controlPointDoc.id,
+      );
     } catch (e) {
-      developer.log('Error deactivating control point: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error deactivating control point: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -725,9 +964,15 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc(controlPointId.value)
           .update({'isActive': true});
 
-      return _foodSafetyMapper.haccpControlPointFromFirestore(controlPointDoc.data()!, controlPointDoc.id);
+      return _foodSafetyMapper.haccpControlPointFromFirestore(
+        controlPointDoc.data()!,
+        controlPointDoc.id,
+      );
     } catch (e) {
-      developer.log('Error activating control point: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error activating control point: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -742,7 +987,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc(id.value)
           .delete();
     } catch (e) {
-      developer.log('Error deleting HACCP control point: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error deleting HACCP control point: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -768,7 +1016,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return audit;
     } catch (e) {
-      developer.log('Error creating food safety audit: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error creating food safety audit: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -777,7 +1028,7 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
   Future<FoodSafetyAudit> updateFoodSafetyAudit(FoodSafetyAudit audit) async {
     try {
       final auditData = _foodSafetyMapper.auditToFirestore(audit);
-      
+
       await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('audits')
@@ -787,7 +1038,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return audit;
     } catch (e) {
-      developer.log('Error updating food safety audit: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error updating food safety audit: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -808,7 +1062,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
 
       return _foodSafetyMapper.auditFromFirestore(doc.data()!, doc.id);
     } catch (e) {
-      developer.log('Error getting food safety audit by ID: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting food safety audit by ID: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -825,31 +1082,50 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting audits by auditor: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting audits by auditor: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<List<FoodSafetyAudit>> getAuditsByDateRange(Time startDate, Time endDate) async {
+  Future<List<FoodSafetyAudit>> getAuditsByDateRange(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final query = await _firestore
           .collection(FirebaseCollections.foodSafety)
           .doc('audits')
           .collection('reports')
-          .where('auditDate', isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch)
-          .where('auditDate', isLessThanOrEqualTo: endDate.millisecondsSinceEpoch)
+          .where(
+            'auditDate',
+            isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch,
+          )
+          .where(
+            'auditDate',
+            isLessThanOrEqualTo: endDate.millisecondsSinceEpoch,
+          )
           .orderBy('auditDate', descending: true)
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting audits by date range: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting audits by date range: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -866,10 +1142,15 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting passed audits: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting passed audits: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -886,10 +1167,15 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting failed audits: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting failed audits: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -906,10 +1192,15 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .get();
 
       return query.docs
-          .map((doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id))
+          .map(
+            (doc) => _foodSafetyMapper.auditFromFirestore(doc.data(), doc.id),
+          )
           .toList();
     } catch (e) {
-      developer.log('Error getting audits by min score: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting audits by min score: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -924,7 +1215,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           .doc(id.value)
           .delete();
     } catch (e) {
-      developer.log('Error deleting food safety audit: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error deleting food safety audit: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -932,10 +1226,13 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
   // ======================== Analytics and Reporting ========================
 
   @override
-  Future<Map<String, dynamic>> getTemperatureComplianceStats(Time startDate, Time endDate) async {
+  Future<Map<String, dynamic>> getTemperatureComplianceStats(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final logs = await getTemperatureLogsByDateRange(startDate, endDate);
-      
+
       if (logs.isEmpty) {
         return {
           'total_logs': 0,
@@ -946,7 +1243,7 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
       }
 
       final compliantLogs = logs.where((log) => log.isWithinSafeRange).length;
-      
+
       return {
         'total_logs': logs.length,
         'compliant_logs': compliantLogs,
@@ -954,27 +1251,34 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         'violations': logs.length - compliantLogs,
       };
     } catch (e) {
-      developer.log('Error getting temperature compliance stats: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature compliance stats: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getViolationTrends(Time startDate, Time endDate) async {
+  Future<Map<String, dynamic>> getViolationTrends(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final violations = await getViolationsByDateRange(startDate, endDate);
-      
+
       final Map<String, int> violationsByType = {};
       final Map<String, int> violationsBySeverity = {};
-      
+
       for (final violation in violations) {
         final typeKey = _violationTypeToString(violation.type);
         final severityKey = _violationSeverityToString(violation.severity);
-        
+
         violationsByType[typeKey] = (violationsByType[typeKey] ?? 0) + 1;
-        violationsBySeverity[severityKey] = (violationsBySeverity[severityKey] ?? 0) + 1;
+        violationsBySeverity[severityKey] =
+            (violationsBySeverity[severityKey] ?? 0) + 1;
       }
-      
+
       return {
         'total_violations': violations.length,
         'violations_by_type': violationsByType,
@@ -982,37 +1286,54 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         'resolved_violations': violations.where((v) => v.isResolved).length,
       };
     } catch (e) {
-      developer.log('Error getting violation trends: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violation trends: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getHACCPComplianceReport(Time startDate, Time endDate) async {
+  Future<Map<String, dynamic>> getHACCPComplianceReport(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final controlPoints = await getActiveControlPoints();
       final violations = await getViolationsByDateRange(startDate, endDate);
-      
+
       return {
         'total_control_points': controlPoints.length,
-        'active_control_points': controlPoints.where((cp) => cp.isActive).length,
+        'active_control_points': controlPoints
+            .where((cp) => cp.isActive)
+            .length,
         'violations_in_period': violations.length,
-        'control_point_violations': violations.where((v) => 
-          v.type == ViolationType.temperatureViolation || 
-          v.type == ViolationType.timeViolation
-        ).length,
+        'control_point_violations': violations
+            .where(
+              (v) =>
+                  v.type == ViolationType.temperatureViolation ||
+                  v.type == ViolationType.timeViolation,
+            )
+            .length,
       };
     } catch (e) {
-      developer.log('Error getting HACCP compliance report: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting HACCP compliance report: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getAuditPerformanceMetrics(Time startDate, Time endDate) async {
+  Future<Map<String, dynamic>> getAuditPerformanceMetrics(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final audits = await getAuditsByDateRange(startDate, endDate);
-      
+
       if (audits.isEmpty) {
         return {
           'total_audits': 0,
@@ -1023,8 +1344,11 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
       }
 
       final passedAudits = audits.where((audit) => audit.passed).length;
-      final totalScore = audits.fold<double>(0.0, (sum, audit) => sum + audit.score);
-      
+      final totalScore = audits.fold<double>(
+        0.0,
+        (total, audit) => total + audit.score,
+      );
+
       return {
         'total_audits': audits.length,
         'passed_audits': passedAudits,
@@ -1032,31 +1356,48 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         'average_score': (totalScore / audits.length * 100).round() / 100,
       };
     } catch (e) {
-      developer.log('Error getting audit performance metrics: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting audit performance metrics: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getControlPointEffectiveness(Time startDate, Time endDate) async {
+  Future<Map<String, dynamic>> getControlPointEffectiveness(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final controlPoints = await getActiveControlPoints();
       final violations = await getViolationsByDateRange(startDate, endDate);
-      
-      final controlPointViolations = violations.where((v) => 
-        v.type == ViolationType.temperatureViolation || 
-        v.type == ViolationType.timeViolation ||
-        v.type == ViolationType.equipmentFailure
-      ).length;
-      
+
+      final controlPointViolations = violations
+          .where(
+            (v) =>
+                v.type == ViolationType.temperatureViolation ||
+                v.type == ViolationType.timeViolation ||
+                v.type == ViolationType.equipmentFailure,
+          )
+          .length;
+
       return {
         'total_control_points': controlPoints.length,
         'control_point_violations': controlPointViolations,
-        'effectiveness_rate': controlPoints.isEmpty ? 0.0 : 
-          ((controlPoints.length - controlPointViolations) / controlPoints.length * 100).round() / 100,
+        'effectiveness_rate': controlPoints.isEmpty
+            ? 0.0
+            : ((controlPoints.length - controlPointViolations) /
+                          controlPoints.length *
+                          100)
+                      .round() /
+                  100,
       };
     } catch (e) {
-      developer.log('Error getting control point effectiveness: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting control point effectiveness: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -1066,7 +1407,7 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
     try {
       final now = Time.now();
       final last30Days = now.subtract(Duration(days: 30));
-      
+
       final [
         temperatureStats,
         violationTrends,
@@ -1076,7 +1417,7 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         getViolationTrends(last30Days, now),
         getAuditPerformanceMetrics(last30Days, now),
       ]);
-      
+
       return {
         'temperature_compliance': temperatureStats,
         'violation_trends': violationTrends,
@@ -1084,7 +1425,10 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         'dashboard_updated_at': now.millisecondsSinceEpoch,
       };
     } catch (e) {
-      developer.log('Error getting food safety dashboard data: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting food safety dashboard data: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -1094,38 +1438,51 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
     try {
       final logsRequiringAction = await getTemperatureLogsRequiringAction();
       final logsOutsideRange = await getTemperatureLogsOutsideSafeRange();
-      
+
       return {
         'logs_requiring_action': logsRequiringAction.length,
         'logs_outside_safe_range': logsOutsideRange.length,
         'total_alerts': logsRequiringAction.length + logsOutsideRange.length,
       };
     } catch (e) {
-      developer.log('Error getting temperature alert summary: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting temperature alert summary: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
 
   @override
-  Future<Map<String, dynamic>> getViolationResolutionMetrics(Time startDate, Time endDate) async {
+  Future<Map<String, dynamic>> getViolationResolutionMetrics(
+    Time startDate,
+    Time endDate,
+  ) async {
     try {
       final violations = await getViolationsByDateRange(startDate, endDate);
-      
+
       final resolvedViolations = violations.where((v) => v.isResolved).length;
-      final overdueViolations = violations.where((v) => 
-        !v.isResolved && 
-        v.reportedAt.isBefore(Time.now().subtract(Duration(hours: 24)))
-      ).length;
-      
+      final overdueViolations = violations
+          .where(
+            (v) =>
+                !v.isResolved &&
+                v.reportedAt.isBefore(Time.now().subtract(Duration(hours: 24))),
+          )
+          .length;
+
       return {
         'total_violations': violations.length,
         'resolved_violations': resolvedViolations,
-        'resolution_rate': violations.isEmpty ? 0.0 : 
-          (resolvedViolations / violations.length * 100).round() / 100,
+        'resolution_rate': violations.isEmpty
+            ? 0.0
+            : (resolvedViolations / violations.length * 100).round() / 100,
         'overdue_violations': overdueViolations,
       };
     } catch (e) {
-      developer.log('Error getting violation resolution metrics: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error getting violation resolution metrics: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       rethrow;
     }
   }
@@ -1140,17 +1497,21 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
           id: UserId.generate(),
           type: ViolationType.temperatureViolation,
           severity: ViolationSeverity.critical,
-          description: 'Temperature out of safe range: ${log.temperature}°${log.unit == TemperatureUnit.fahrenheit ? 'F' : 'C'} at ${_temperatureLocationToString(log.location)}',
+          description:
+              'Temperature out of safe range: ${log.temperature}°${log.unit == TemperatureUnit.fahrenheit ? 'F' : 'C'} at ${_temperatureLocationToString(log.location)}',
           location: log.location,
           reportedBy: log.recordedBy,
           reportedAt: log.recordedAt,
           temperatureReading: log.temperature,
         );
-        
+
         await createFoodSafetyViolation(violation);
       }
     } catch (e) {
-      developer.log('Error checking temperature violations: $e', name: 'FirebaseFoodSafetyRepository');
+      developer.log(
+        'Error checking temperature violations: $e',
+        name: 'FirebaseFoodSafetyRepository',
+      );
       // Don't rethrow here as this is a side effect
     }
   }
@@ -1232,14 +1593,24 @@ class FirebaseFoodSafetyRepository implements FoodSafetyRepository {
         return 'preparation';
       case CCPType.cooking:
         return 'cooking';
+      case CCPType.hotHolding:
+        return 'hot_holding';
+      case CCPType.coldHolding:
+        return 'cold_holding';
+      case CCPType.holding:
+        return 'holding';
       case CCPType.cooling:
         return 'cooling';
       case CCPType.reheating:
         return 'reheating';
-      case CCPType.holding:
-        return 'holding';
       case CCPType.service:
         return 'service';
+      case CCPType.sanitizerConcentration:
+        return 'sanitizer_concentration';
+      case CCPType.handWashing:
+        return 'hand_washing';
+      case CCPType.crossContaminationPrevention:
+        return 'cross_contamination_prevention';
     }
   }
 }

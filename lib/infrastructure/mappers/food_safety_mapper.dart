@@ -420,16 +420,22 @@ class FoodSafetyMapper {
         return 'receiving';
       case CCPType.storage:
         return 'storage';
+      case CCPType.preparation:
+        return 'preparation';
       case CCPType.cooking:
         return 'cooking';
       case CCPType.hotHolding:
         return 'hot_holding';
       case CCPType.coldHolding:
         return 'cold_holding';
+      case CCPType.holding:
+        return 'holding';
       case CCPType.cooling:
         return 'cooling';
       case CCPType.reheating:
         return 'reheating';
+      case CCPType.service:
+        return 'service';
       case CCPType.sanitizerConcentration:
         return 'sanitizer_concentration';
       case CCPType.handWashing:
@@ -445,16 +451,22 @@ class FoodSafetyMapper {
         return CCPType.receiving;
       case 'storage':
         return CCPType.storage;
+      case 'preparation':
+        return CCPType.preparation;
       case 'cooking':
         return CCPType.cooking;
       case 'hot_holding':
         return CCPType.hotHolding;
       case 'cold_holding':
         return CCPType.coldHolding;
+      case 'holding':
+        return CCPType.holding;
       case 'cooling':
         return CCPType.cooling;
       case 'reheating':
         return CCPType.reheating;
+      case 'service':
+        return CCPType.service;
       case 'sanitizer_concentration':
         return CCPType.sanitizerConcentration;
       case 'hand_washing':
