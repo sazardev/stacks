@@ -285,9 +285,9 @@ class AuthenticationService {
 
 /// Authentication failure types
 class AuthenticationFailure extends Failure {
-  const AuthenticationFailure(String message) : super(message);
+  const AuthenticationFailure(super.message);
 }
 
 class ValidationFailure extends Failure {
-  const ValidationFailure(String message) : super(message);
+  const ValidationFailure(super.message);
 }

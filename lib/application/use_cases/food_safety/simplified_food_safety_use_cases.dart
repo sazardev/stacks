@@ -160,7 +160,7 @@ class MonitorTemperatureComplianceUseCase {
       final violations = locationLogs
           .where((log) => !log.isWithinSafeRange)
           .length;
-      final complianceRate = locationLogs.length > 0
+      final complianceRate = locationLogs.isNotEmpty
           ? ((locationLogs.length - violations) / locationLogs.length) * 100
           : 100.0;
 
@@ -579,7 +579,7 @@ class ManageFoodSafetyViolationsUseCase {
 
     if (criticalUnresolved > 0) {
       actions.add(
-        'CRITICAL: ${criticalUnresolved} unresolved critical violations require immediate attention',
+        'CRITICAL: $criticalUnresolved unresolved critical violations require immediate attention',
       );
     }
 

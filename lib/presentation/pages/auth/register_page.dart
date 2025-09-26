@@ -200,7 +200,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   Widget _buildRoleSelector() {
     return DropdownButtonFormField<UserRole>(
-      value: _selectedRole,
+      initialValue: _selectedRole,
       decoration: InputDecoration(
         labelText: 'Kitchen Role',
         prefixIcon: const Icon(Icons.work_outline),

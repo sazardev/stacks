@@ -11,7 +11,6 @@ import '../../../domain/repositories/user_repository.dart';
 import '../../../domain/failures/failures.dart';
 import '../../../domain/value_objects/user_id.dart';
 import '../../../domain/value_objects/time.dart';
-import '../../dtos/analytics_dtos.dart';
 
 /// Advanced use case for generating comprehensive kitchen performance analytics
 @injectable

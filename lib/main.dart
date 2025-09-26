@@ -13,7 +13,7 @@ void main() async {
 }
 
 class RestaurantManagementApp extends StatelessWidget {
-  const RestaurantManagementApp({Key? key}) : super(key: key);
+  const RestaurantManagementApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class RestaurantManagementApp extends StatelessWidget {
 }
 
 class AppShell extends StatefulWidget {
-  const AppShell({Key? key}) : super(key: key);
+  const AppShell({super.key});
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -101,7 +101,7 @@ class _AppShellState extends State<AppShell> {
 
 // Placeholder pages for complete navigation
 class StationManagementPage extends StatelessWidget {
-  const StationManagementPage({Key? key}) : super(key: key);
+  const StationManagementPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +133,7 @@ class StationManagementPage extends StatelessWidget {
 }
 
 class AnalyticsPage extends StatelessWidget {
-  const AnalyticsPage({Key? key}) : super(key: key);
+  const AnalyticsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +165,7 @@ class AnalyticsPage extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {

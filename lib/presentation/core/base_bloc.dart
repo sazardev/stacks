@@ -89,7 +89,7 @@ abstract class BaseBloc<Event extends BaseEvent, State extends BaseState>
     // In development, log state transitions
     // In production, you might want to send to analytics
     print(
-      '${runtimeType}: ${transition.currentState.runtimeType} -> ${transition.nextState.runtimeType}',
+      '$runtimeType: ${transition.currentState.runtimeType} -> ${transition.nextState.runtimeType}',
     );
   }
 
@@ -98,7 +98,7 @@ abstract class BaseBloc<Event extends BaseEvent, State extends BaseState>
   void onError(Object error, StackTrace stackTrace) {
     super.onError(error, stackTrace);
     // Log error for debugging and crash reporting
-    print('${runtimeType} Error: $error');
+    print('$runtimeType Error: $error');
     print('StackTrace: $stackTrace');
   }
 }

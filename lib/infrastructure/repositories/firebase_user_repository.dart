@@ -570,9 +570,9 @@ class FirebaseUserRepository implements UserRepository {
 
 /// Additional failure types for user operations
 class NotFoundFailure extends Failure {
-  const NotFoundFailure(String message) : super(message);
+  const NotFoundFailure(super.message);
 }
 
 class ConflictFailure extends Failure {
-  const ConflictFailure(String message) : super(message);
+  const ConflictFailure(super.message);
 }
