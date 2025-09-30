@@ -1,1 +1,29 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"stacks-restaurant-management","appId":"1:692681414437:android:08780c7d8f8cf7d5556ccc","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"stacks-restaurant-management","configurations":{"android":"1:692681414437:android:08780c7d8f8cf7d5556ccc","ios":"1:692681414437:ios:8d2c510ff111a346556ccc","macos":"1:692681414437:ios:8d2c510ff111a346556ccc","web":"1:692681414437:web:af5169f26b4dd124556ccc","windows":"1:692681414437:web:26d36c3dee7bc787556ccc"}}}}}}
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "stacks-restaurant-management",
+          "appId": "1:692681414437:android:08780c7d8f8cf7d5556ccc",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "stacks-restaurant-management",
+          "configurations": {
+            "android": "1:692681414437:android:08780c7d8f8cf7d5556ccc",
+            "ios": "1:692681414437:ios:8d2c510ff111a346556ccc",
+            "macos": "1:692681414437:ios:8d2c510ff111a346556ccc",
+            "web": "1:692681414437:web:af5169f26b4dd124556ccc",
+            "windows": "1:692681414437:web:26d36c3dee7bc787556ccc"
+          }
+        }
+      }
+    }
+  }
+}

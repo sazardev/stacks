@@ -45,8 +45,8 @@ service cloud.firestore {
     }
     
     // Validate timestamp is not in the future
-    function isValidTimestamp(timestamp) {
-      return timestamp <= request.time;
+    function isValidTimestamp(ts) {
+      return ts <= request.time;
     }
 
     // ==================== Users Collection ====================
