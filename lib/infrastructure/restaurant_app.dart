@@ -35,7 +35,7 @@ class RestaurantApp {
       print('✅ Firestore structure initialized');
 
       // Configure dependency injection
-      await setupDependencyInjection();
+      await configureDependencies();
       print('✅ Dependency injection configured');
 
       // Display required indexes information

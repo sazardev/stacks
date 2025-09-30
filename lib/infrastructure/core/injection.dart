@@ -1,7 +1,10 @@
 // Dependency Injection Configuration for Clean Architecture
-// Registers all repositories, mappers, and services using GetIt and Injectable
+// Registers all repositories, mappers, and services using GetIt
+// USING ONLY FIREBASE IMPLEMENTATIONS - NO MOCKS!
 
 import 'package:get_it/get_it.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // Import all mappers
 import '../mappers/user_mapper.dart';
@@ -15,7 +18,7 @@ import '../mappers/kitchen_timer_mapper.dart';
 import '../mappers/food_safety_mapper.dart';
 import '../mappers/cost_tracking_mapper.dart';
 
-// Import all repositories
+// Import ONLY Firebase repositories (NO MOCKS!)
 import '../repositories/firebase_user_repository.dart';
 import '../repositories/firebase_order_repository.dart';
 import '../repositories/firebase_station_repository.dart';
@@ -23,8 +26,8 @@ import '../repositories/firebase_recipe_repository.dart';
 import '../repositories/firebase_inventory_repository.dart';
 import '../repositories/firebase_table_repository.dart';
 import '../repositories/firebase_kitchen_timer_repository.dart';
-import '../repositories/analytics_repository_impl.dart';
-import '../repositories/food_safety_repository_impl.dart';
+import '../repositories/firebase_food_safety_repository.dart';
+import '../repositories/firebase_analytics_repository.dart';
 import '../repositories/firebase_cost_tracking_repository.dart';
 
 // Import domain repository interfaces
@@ -44,9 +47,15 @@ import '../../presentation/core/presentation_injection.dart';
 
 final GetIt getIt = GetIt.instance;
 
-// Manual registration for cases where automatic generation might not work
-Future<void> setupDependencyInjection() async {
-  // Mappers
+/// Configure dependency injection - ALL USING FIREBASE!
+Future<void> configureDependencies() async {
+  // Register Firebase instances
+  getIt.registerLazySingleton<FirebaseFirestore>(
+    () => FirebaseFirestore.instance,
+  );
+  getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+
+  // Register all mappers
   getIt.registerLazySingleton<UserMapper>(() => UserMapper());
   getIt.registerLazySingleton<OrderMapper>(() => OrderMapper());
   getIt.registerLazySingleton<StationMapper>(() => StationMapper());
@@ -58,7 +67,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<FoodSafetyMapper>(() => FoodSafetyMapper());
   getIt.registerLazySingleton<CostTrackingMapper>(() => CostTrackingMapper());
 
-  // Repositories - Using Firebase implementations where available
+  // Register ALL repositories using Firebase - NO MOCKS!
+
+  // Repositories that take ONLY mapper
   getIt.registerLazySingleton<UserRepository>(
     () => FirebaseUserRepository(getIt<UserMapper>()),
   );
@@ -83,20 +94,30 @@ Future<void> setupDependencyInjection() async {
     () => FirebaseTableRepository(getIt<TableMapper>()),
   );
 
-  getIt.registerLazySingleton<AnalyticsRepository>(
-    () => AnalyticsRepositoryImpl(analyticsMapper: getIt<AnalyticsMapper>()),
-  );
-
   getIt.registerLazySingleton<KitchenTimerRepository>(
     () => FirebaseKitchenTimerRepository(getIt<KitchenTimerMapper>()),
   );
 
-  getIt.registerLazySingleton<FoodSafetyRepository>(
-    () => FoodSafetyRepositoryImpl(),
-  );
-
   getIt.registerLazySingleton<CostTrackingRepository>(
     () => FirebaseCostTrackingRepository(getIt<CostTrackingMapper>()),
+  );
+
+  // Repositories that take BOTH firestore AND mapper
+
+  // ✅ Using Firebase Analytics Repository - NOT the mock!
+  getIt.registerLazySingleton<AnalyticsRepository>(
+    () => FirebaseAnalyticsRepository(
+      getIt<FirebaseFirestore>(),
+      getIt<AnalyticsMapper>(),
+    ),
+  );
+
+  // ✅ Using Firebase Food Safety Repository - NOT the stub!
+  getIt.registerLazySingleton<FoodSafetyRepository>(
+    () => FirebaseFoodSafetyRepository(
+      firestore: getIt<FirebaseFirestore>(),
+      foodSafetyMapper: getIt<FoodSafetyMapper>(),
+    ),
   );
 
   // Setup presentation layer dependencies (BLoCs and use cases)

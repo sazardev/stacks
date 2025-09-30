@@ -16,8 +16,11 @@ import '../../../domain/value_objects/time.dart';
 @injectable
 class GenerateKitchenPerformanceAnalyticsUseCase {
   final AnalyticsRepository _analyticsRepository;
+  // Note: These are injected for potential future cross-repository analytics
+  // ignore: unused_field
   final OrderRepository _orderRepository;
   final StationRepository _stationRepository;
+  // ignore: unused_field
   final UserRepository _userRepository;
 
   const GenerateKitchenPerformanceAnalyticsUseCase({

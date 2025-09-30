@@ -14,6 +14,8 @@ import '../../../domain/value_objects/time.dart';
 @injectable
 class MonitorTemperatureComplianceUseCase {
   final FoodSafetyRepository _foodSafetyRepository;
+  // Note: Injected for potential future user-specific compliance tracking
+  // ignore: unused_field
   final UserRepository _userRepository;
 
   const MonitorTemperatureComplianceUseCase({
@@ -290,6 +292,8 @@ class MonitorTemperatureComplianceUseCase {
 @injectable
 class ManageFoodSafetyViolationsUseCase {
   final FoodSafetyRepository _foodSafetyRepository;
+  // Note: Injected for potential future user-specific violation management
+  // ignore: unused_field
   final UserRepository _userRepository;
 
   const ManageFoodSafetyViolationsUseCase({

@@ -23,7 +23,10 @@ export 'use_cases/recipe/recipe_use_cases.dart';
 export 'use_cases/inventory/inventory_use_cases.dart';
 export 'use_cases/table/table_use_cases.dart';
 export 'use_cases/kitchen_timer/kitchen_timer_use_cases.dart';
-export 'use_cases/food_safety/food_safety_use_cases.dart';
+// Use simplified_food_safety_use_cases.dart (most complete version)
+export 'use_cases/food_safety/simplified_food_safety_use_cases.dart';
+// Advanced food safety use cases used by BLoCs
+export 'use_cases/food_safety/advanced_food_safety_use_cases.dart';
 export 'use_cases/cost_tracking/cost_tracking_use_cases.dart';
 
 /// Application Layer Overview:
